@@ -10,8 +10,10 @@ namespace
     constexpr auto COMMAND_PROMPT = "server>>>";
 }
 
-TerminalInterface::TerminalInterface() :
-        _thread(boost::ref(*this))
+TerminalInterface::TerminalInterface(Server *server) :
+        _thread(boost::ref(*this)),
+        _server(server),
+        _running(false)
 {
 }
 
@@ -22,25 +24,40 @@ TerminalInterface::~TerminalInterface()
 
 void TerminalInterface::operator()()
 {
-    std::string command;
+    _running = true;
+    char character;
 
-    running = true;
-
-    while (running) {
+    while (_running) {
         std::cout << COMMAND_PROMPT;
-        std::cin >> command;
 
-        if (commandMap.find(command) != commandMap.end()) {
-            commandMap.at(command)();
+        while((character = std::cin.get()) != '\n') {
+            _currentCommand += character;
         }
+
+        if (commandMap.find(_currentCommand) != commandMap.end()) {
+            commandMap.at(_currentCommand)();
+        }
+
+        _currentCommand.clear();
     }
 }
 
 void TerminalInterface::Stop()
 {
-    running = false;
+    _running = false;
+    if (_server != nullptr) {
+        _server->Halt();
+    }
 }
 
+void TerminalInterface::SetServer(Server *server)
+{
+    _server = server;
+}
 
-
-
+void TerminalInterface::PrintMessage(const std::string &message)
+{
+    boost::lock_guard lock(_terminalMutex);
+    std::cout << '\n' << message << '\n';
+    std::cout << COMMAND_PROMPT + _currentCommand;
+}

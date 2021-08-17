@@ -10,16 +10,26 @@
 
 using boost::asio::ip::tcp;
 
+class TerminalInterface;
+
 class Server
 {
 public:
-    Server();
-    void Run();
+    explicit Server(TerminalInterface *terminalInterface = nullptr);
+
+    int Run();
+
+    void Halt();
+
+    void SetTerminalInterface(TerminalInterface *terminalInterface);
 
 private:
-    void ConnectionAccept(boost::system::error_code errorCode, tcp::socket socket);
+    void HandleNewConnection(boost::system::error_code errorCode, tcp::socket socket);
 
     void AcceptNewConnections(tcp::acceptor &acceptor);
 
     std::string makeDaytimeString();
+
+    boost::asio::io_service _ioService;
+    TerminalInterface *_terminalInterface;
 };

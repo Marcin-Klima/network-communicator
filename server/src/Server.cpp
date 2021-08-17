@@ -4,27 +4,32 @@
 
 #include "Server.h"
 #include <iostream>
+
 #include <ctime>
 #include <boost/bind/bind.hpp>
 #include <boost/bind/placeholders.hpp>
+#include "TerminalInterface.h"
 
-Server::Server()
+Server::Server(TerminalInterface *terminalInterface) : _terminalInterface(terminalInterface)
 {
 
 }
 
-void Server::Run()
+int Server::Run()
 {
     try {
-        boost::asio::io_service ioService;
-        tcp::acceptor acceptor(ioService, tcp::endpoint(tcp::v4(), 13));
+        tcp::acceptor acceptor(_ioService, tcp::endpoint(tcp::v4(), 13));
 
         AcceptNewConnections(acceptor);
 
-        ioService.run();
+        _ioService.run();
+
+        return 0;
     }
     catch (std::exception &e) {
         std::cerr << e.what() << std::endl;
+
+        return -1;
     }
 }
 
@@ -35,8 +40,13 @@ std::string Server::makeDaytimeString()
     return ctime(&now);
 }
 
-void Server::ConnectionAccept(boost::system::error_code errorCode, tcp::socket socket)
+void Server::HandleNewConnection(boost::system::error_code errorCode, tcp::socket socket)
 {
+    if (_terminalInterface != nullptr) {
+        _terminalInterface->PrintMessage(
+                "Client has connect from address: " + socket.remote_endpoint().address().to_string());
+    }
+
     std::string message = makeDaytimeString();
 
     boost::system::error_code ignored_error;
@@ -47,8 +57,18 @@ void Server::ConnectionAccept(boost::system::error_code errorCode, tcp::socket s
 void Server::AcceptNewConnections(tcp::acceptor &acceptor)
 {
     acceptor.async_accept([this, &acceptor](boost::system::error_code errorCode, tcp::socket socket) {
-        ConnectionAccept(errorCode, std::move(socket));
+        HandleNewConnection(errorCode, std::move(socket));
 
         AcceptNewConnections(acceptor);
     });
+}
+
+void Server::Halt()
+{
+    _ioService.stop();
+}
+
+void Server::SetTerminalInterface(TerminalInterface *terminalInterface)
+{
+    _terminalInterface = terminalInterface;
 }

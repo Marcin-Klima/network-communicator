@@ -4,13 +4,14 @@
 
 #include "Server.h"
 #include "TerminalInterface.h"
-#include <iostream>
 
 int main()
 {
     Server server;
-    server.Run();
     TerminalInterface terminalInterface;
 
-	return 0;
+    server.SetTerminalInterface(&terminalInterface);
+    terminalInterface.SetServer(&server);
+
+    return server.Run();
 }
