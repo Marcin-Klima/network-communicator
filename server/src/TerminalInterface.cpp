@@ -4,33 +4,31 @@
 
 #include <iostream>
 #include "TerminalInterface.h"
+#include <boost/function.hpp>
 
 namespace
 {
-    constexpr auto COMMAND_PROMPT = "server>>>";
+    constexpr auto COMMAND_PROMPT = "server_>>>";
 }
 
-TerminalInterface::TerminalInterface(Server *server) :
-        _thread(boost::ref(*this)),
-        _server(server),
-        _running(false)
+TerminalInterface::TerminalInterface(Server *server) : _server(server)
 {
 }
 
 TerminalInterface::~TerminalInterface()
 {
-    _thread.join();
 }
 
 void TerminalInterface::operator()()
 {
-    _running = true;
     char character;
 
     while (_running) {
+        terminalMutex.lock();
         std::cout << COMMAND_PROMPT;
+        terminalMutex.unlock();
 
-        while((character = std::cin.get()) != '\n') {
+        while ((character = std::cin.get()) != '\n') {
             _currentCommand += character;
         }
 
@@ -45,19 +43,17 @@ void TerminalInterface::operator()()
 void TerminalInterface::Stop()
 {
     _running = false;
-    if (_server != nullptr) {
-        _server->Halt();
-    }
-}
-
-void TerminalInterface::SetServer(Server *server)
-{
-    _server = server;
 }
 
 void TerminalInterface::PrintMessage(const std::string &message)
 {
-    boost::lock_guard lock(_terminalMutex);
-    std::cout << '\n' << message << '\n';
-    std::cout << COMMAND_PROMPT + _currentCommand;
+    boost::lock_guard lock(terminalMutex);
+    std::cout << '\r' << message << '\n';
+    std::cout << COMMAND_PROMPT;
+}
+
+void TerminalInterface::Run()
+{
+    auto fun = boost::function<void()>(boost::ref(&TerminalInterface::Run));
+    _thread = std::make_unique<boost::thread>(new boost::thread(fun));
 }

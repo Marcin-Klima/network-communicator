@@ -7,21 +7,20 @@
 #include <boost/asio.hpp>
 
 #include <string>
+#include "TerminalOutput.h"
 
 using boost::asio::ip::tcp;
-
-class TerminalInterface;
 
 class Server
 {
 public:
-    explicit Server(TerminalInterface *terminalInterface = nullptr);
+    Server();
 
     int Run();
 
     void Halt();
 
-    void SetTerminalInterface(TerminalInterface *terminalInterface);
+    void SetTerminalOutput(TerminalOutput *terminalOutput);
 
 private:
     void HandleNewConnection(boost::system::error_code errorCode, tcp::socket socket);
@@ -29,7 +28,8 @@ private:
     void AcceptNewConnections(tcp::acceptor &acceptor);
 
     std::string makeDaytimeString();
-
-    boost::asio::io_service _ioService;
-    TerminalInterface *_terminalInterface;
+    boost::asio::io_service ioService;
+    TerminalOutput *terminalOutput;
+    TerminalInterface terminalInterface;
 };
+

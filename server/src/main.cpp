@@ -8,10 +8,10 @@
 int main()
 {
     Server server;
-    TerminalInterface terminalInterface;
+//    TerminalInterface terminalInterface;
 
-    server.SetTerminalInterface(&terminalInterface);
-    terminalInterface.SetServer(&server);
+//    TerminalOutput terminalOutput(terminalInterface);
+//    server.SetTerminalOutput(&terminalOutput);
 
     return server.Run();
 }

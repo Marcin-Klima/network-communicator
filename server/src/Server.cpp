@@ -8,9 +8,8 @@
 #include <ctime>
 #include <boost/bind/bind.hpp>
 #include <boost/bind/placeholders.hpp>
-#include "TerminalInterface.h"
 
-Server::Server(TerminalInterface *terminalInterface) : _terminalInterface(terminalInterface)
+Server::Server() : terminalInterface(this)
 {
 
 }
@@ -18,11 +17,11 @@ Server::Server(TerminalInterface *terminalInterface) : _terminalInterface(termin
 int Server::Run()
 {
     try {
-        tcp::acceptor acceptor(_ioService, tcp::endpoint(tcp::v4(), 13));
+        tcp::acceptor acceptor(ioService, tcp::endpoint(tcp::v4(), 13));
 
         AcceptNewConnections(acceptor);
 
-        _ioService.run();
+        ioService.run();
 
         return 0;
     }
@@ -42,9 +41,8 @@ std::string Server::makeDaytimeString()
 
 void Server::HandleNewConnection(boost::system::error_code errorCode, tcp::socket socket)
 {
-    if (_terminalInterface != nullptr) {
-        _terminalInterface->PrintMessage(
-                "Client has connect from address: " + socket.remote_endpoint().address().to_string());
+    if (terminalOutput != nullptr) {
+        terminalOutput->Print("Client connected from: " +socket.remote_endpoint().address().to_string());
     }
 
     std::string message = makeDaytimeString();
@@ -65,10 +63,10 @@ void Server::AcceptNewConnections(tcp::acceptor &acceptor)
 
 void Server::Halt()
 {
-    _ioService.stop();
+    ioService.stop();
 }
 
-void Server::SetTerminalInterface(TerminalInterface *terminalInterface)
+void Server::SetTerminalOutput(TerminalOutput *terminalOutput)
 {
-    _terminalInterface = terminalInterface;
+    this->terminalOutput = terminalOutput;
 }

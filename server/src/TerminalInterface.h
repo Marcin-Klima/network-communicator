@@ -6,31 +6,35 @@
 
 #include <boost/thread/thread.hpp>
 #include <boost/function.hpp>
-#include "Server.h"
+
+class Server;
 
 class TerminalInterface
 {
+    friend class TerminalOutput;
+
 public:
-    TerminalInterface(Server *server = nullptr);
+    TerminalInterface(Server *server);
 
     ~TerminalInterface();
+
+    void Run();
 
     void operator()();
 
     void Stop();
 
-    void SetServer(Server *server);
-
+private:
     void PrintMessage(const std::string &message);
 
-private:
-    boost::thread _thread;
-    boost::mutex _terminalMutex;
+    std::unique_ptr<boost::thread> _thread;
+    boost::mutex terminalMutex;
 
     std::string _currentCommand;
     bool _running;
     const std::map<std::string, boost::function<void()>> commandMap = {
             {"exit", boost::bind(&TerminalInterface::Stop, this)}
     };
+
     Server *_server;
 };
