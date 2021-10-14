@@ -8,24 +8,25 @@
 #include <boost/function.hpp>
 
 class Server;
+class TerminalInterfaceServerMediator;
 
 class TerminalInterface
 {
-    friend class TerminalOutput;
-
 public:
-    TerminalInterface(Server *server);
+    TerminalInterface();
 
     ~TerminalInterface();
 
     void Run();
 
-    void operator()();
-
     void Stop();
 
+    void SetMediator(TerminalInterfaceServerMediator* terminalInterfaceServerMediator);
+
+    void PrintMessage(const std::string& message);
+
 private:
-    void PrintMessage(const std::string &message);
+    void ThreadLoop();
 
     std::unique_ptr<boost::thread> _thread;
     boost::mutex terminalMutex;
@@ -36,5 +37,5 @@ private:
             {"exit", boost::bind(&TerminalInterface::Stop, this)}
     };
 
-    Server *_server;
+    TerminalInterfaceServerMediator* _mediator;
 };

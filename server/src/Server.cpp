@@ -2,20 +2,25 @@
 // Created by Marcin on 8/10/2021.
 //
 
-#include "Server.h"
 #include <iostream>
-
 #include <ctime>
 #include <boost/bind/bind.hpp>
 #include <boost/bind/placeholders.hpp>
 
-Server::Server() : terminalInterface(this)
-{
+#include "Server.h"
+#include "TerminalInterfaceServerMediator.h"
 
+Server::Server()
+{
 }
 
 int Server::Run()
 {
+    for (int i = 0; i < 10; ++i) {
+        boost::this_thread::sleep_for(boost::chrono::seconds(1));
+        _mediator->PrintMessage("dupa");
+    }
+
     try {
         tcp::acceptor acceptor(ioService, tcp::endpoint(tcp::v4(), 13));
 
@@ -25,7 +30,7 @@ int Server::Run()
 
         return 0;
     }
-    catch (std::exception &e) {
+    catch (std::exception& e) {
         std::cerr << e.what() << std::endl;
 
         return -1;
@@ -41,10 +46,6 @@ std::string Server::makeDaytimeString()
 
 void Server::HandleNewConnection(boost::system::error_code errorCode, tcp::socket socket)
 {
-    if (terminalOutput != nullptr) {
-        terminalOutput->Print("Client connected from: " +socket.remote_endpoint().address().to_string());
-    }
-
     std::string message = makeDaytimeString();
 
     boost::system::error_code ignored_error;
@@ -52,7 +53,7 @@ void Server::HandleNewConnection(boost::system::error_code errorCode, tcp::socke
                        boost::asio::transfer_all(), ignored_error);
 }
 
-void Server::AcceptNewConnections(tcp::acceptor &acceptor)
+void Server::AcceptNewConnections(tcp::acceptor& acceptor)
 {
     acceptor.async_accept([this, &acceptor](boost::system::error_code errorCode, tcp::socket socket) {
         HandleNewConnection(errorCode, std::move(socket));
@@ -66,7 +67,11 @@ void Server::Halt()
     ioService.stop();
 }
 
-void Server::SetTerminalOutput(TerminalOutput *terminalOutput)
+Server::~Server()
 {
-    this->terminalOutput = terminalOutput;
+}
+
+void Server::SetMediator(TerminalInterfaceServerMediator* terminalInterfaceServerMediator)
+{
+    _mediator = terminalInterfaceServerMediator;
 }

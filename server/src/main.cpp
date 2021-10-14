@@ -4,14 +4,17 @@
 
 #include "Server.h"
 #include "TerminalInterface.h"
+//#include "TerminalInterfaceServerMediator.h"
+#include <iostream>
 
 int main()
 {
     Server server;
-//    TerminalInterface terminalInterface;
+    TerminalInterface terminalInterface;
+    TerminalInterfaceServerMediator terminalInterfaceServerMediator(&server, &terminalInterface);
 
-//    TerminalOutput terminalOutput(terminalInterface);
-//    server.SetTerminalOutput(&terminalOutput);
+    terminalInterface.Run();
+    server.Run();
 
-    return server.Run();
+    return 0;
 }

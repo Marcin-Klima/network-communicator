@@ -5,10 +5,12 @@ target_sources(klima-server PRIVATE
 		src/Server.cpp
 		src/TerminalInterface.cpp
 		src/TerminalOutput.cpp
+		src/TerminalInterfaceServerMediator.cpp
 
 		src/Server.h
 		src/TerminalInterface.h
 		src/TerminalOutput.h
+		src/TerminalInterfaceServerMediator.h
 )
 
 target_compile_definitions(klima-server PRIVATE _WIN32_WINNT=0x0601)
