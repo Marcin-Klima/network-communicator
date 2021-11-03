@@ -12,5 +12,7 @@ endif()
 
 conan_basic_setup()
 
+find_package(Qt5 COMPONENTS Widgets Qml Quick REQUIRED)
+
 add_subdirectory(server)
 add_subdirectory(client)

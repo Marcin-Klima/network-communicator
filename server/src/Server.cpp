@@ -16,9 +16,9 @@ Server::Server()
 
 int Server::Run()
 {
-    for (int i = 0; i < 10; ++i) {
+    for(int i = 0; i < 10; ++i) {
+        _mediator->PrintMessage("DUPA");
         boost::this_thread::sleep_for(boost::chrono::seconds(1));
-        _mediator->PrintMessage("dupa");
     }
 
     try {

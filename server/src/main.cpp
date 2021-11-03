@@ -1,20 +1,10 @@
-//
-// Created by Marcin on 8/5/2021.
-//
+#include <QApplication>
+#include <QQmlApplicationEngine>
 
-#include "Server.h"
-#include "TerminalInterface.h"
-//#include "TerminalInterfaceServerMediator.h"
-#include <iostream>
-
-int main()
+int main(int argc, char** argv)
 {
-    Server server;
-    TerminalInterface terminalInterface;
-    TerminalInterfaceServerMediator terminalInterfaceServerMediator(&server, &terminalInterface);
-
-    terminalInterface.Run();
-    server.Run();
-
-    return 0;
+    QApplication app(argc, argv);
+    QQmlApplicationEngine engine;
+    engine.load(QUrl(QStringLiteral("qrc:\\main.qml")));
+    return app.exec();
 }

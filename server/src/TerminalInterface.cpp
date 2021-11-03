@@ -27,18 +27,33 @@ TerminalInterface::~TerminalInterface()
 void TerminalInterface::ThreadLoop()
 {
     char character;
+    INPUT_RECORD inputBuffer[128];
+    HANDLE stdinHandle;
+    DWORD dataRead;
+
+    stdinHandle = GetStdHandle(STD_INPUT_HANDLE);
 
     while (_running) {
         terminalMutex.lock();
         std::cout << COMMAND_PROMPT << _currentCommand;
         terminalMutex.unlock();
 
-        while ((character = getch()) != '\r') {
-            if(static_cast<int>(character) == 8) {
-                _currentCommand.append("XD");
+        char inputCharacter = 0;
+        while (inputCharacter != '\r') {
+            ReadConsoleInput(stdinHandle, inputBuffer, 128, &dataRead);
+            for (int i = 0; i < dataRead; ++i) {
+                if (inputBuffer[i].EventType == KEY_EVENT) {
+                    if (inputBuffer[i].Event.KeyEvent.bKeyDown) {
+                        inputCharacter = inputBuffer[i].Event.KeyEvent.uChar.AsciiChar;
+                        if (inputCharacter != '\r') {
+                            if (inputCharacter == '\b') {
+
+                            }
+                            std::cout << inputCharacter;
+                        }
+                    }
+                }
             }
-            _currentCommand.push_back(character);
-            std::cout << character;
         }
 
         if (_currentCommand == "exit") {
@@ -64,8 +79,8 @@ void TerminalInterface::PrintMessage(const std::string& message)
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
     int columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-    std::string emptyLine(columns, ' ');
-    std::cout << '\r' << emptyLine << '\n';
+    std::string emptyLine("\r" + std::string(columns, ' ') + message);
+    std::cout << emptyLine << '\n';
 
     std::cout << COMMAND_PROMPT << _currentCommand;
 }
