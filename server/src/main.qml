@@ -1,11 +1,12 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.0
 import QtQuick.Layouts 1.1
+import QtQuick.Controls.Styles 1.4
 
 ApplicationWindow {
     visible: true
-    width: 640
-    height: 480
+    width: 1024
+    height: 768
     title: qsTr("Minimal Qml")
     color: "#000000"
 
@@ -13,26 +14,54 @@ ApplicationWindow {
         console.log("DUPA")
     }
 
-    ColumnLayout {
+    Rectangle {
+        id: rectangle
+        color: "#000000"
         anchors.fill: parent
+        anchors.margins: 5
+        border.color: "#22b455"
+        border.width: 3
 
-        Rectangle {
-            color: "#54DEFD"
-            Layout.fillHeight: true
-            Layout.fillWidth: true
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 10
 
-            TextEdit {
-                color: "#FFFBFA"
-                anchors.fill: parent
-                font.pointSize: 22
-                selectionColor: "#8BD7D2"
+
+            Rectangle {
+                color: "#204829"
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+
+                TextArea {
+                    anchors.fill: parent
+                    anchors.margins: 3
+                    font.pixelSize: 20
+                    text: "dupa"
+                    wrapMode: Text.WordWrap
+                    readOnly: true
+                    backgroundVisible: false
+                }
             }
-        }
 
-        Rectangle {
-            color: "#49C6E5"
-            Layout.fillHeight: true
-            Layout.fillWidth: true
+            Rectangle {
+                color: "#92e5a1"
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+
+                TextArea {
+                    font.pixelSize: 20
+                    anchors.fill: parent
+                    anchors.margins: 3
+                    backgroundVisible: false
+                }
+            }
+
         }
     }
 }
+
+/*##^##
+Designer {
+    D{i:0;formeditorZoom:0.9}
+}
+##^##*/

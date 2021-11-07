@@ -8,6 +8,7 @@
 #include <boost/thread/thread.hpp>
 
 #include <string>
+#include <QObject>
 #include "TerminalInterfaceServerMediator.h"
 
 
@@ -15,8 +16,10 @@ using boost::asio::ip::tcp;
 
 class TerminalInterfaceServerMediator;
 
-class Server
+class Server : public QObject
 {
+    Q_OBJECT
+
 public:
     Server();
 
@@ -31,9 +34,10 @@ public:
 private:
     void HandleNewConnection(boost::system::error_code errorCode, tcp::socket socket);
 
-    void AcceptNewConnections(tcp::acceptor &acceptor);
+    void AcceptNewConnections(tcp::acceptor& acceptor);
 
     std::string makeDaytimeString();
+
     boost::asio::io_service ioService;
     TerminalInterfaceServerMediator* _mediator;
 };

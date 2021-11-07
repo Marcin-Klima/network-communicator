@@ -27,6 +27,7 @@ message(STATUS ${CONAN_LIBS})
 
 target_link_libraries(klima-server
 		${CONAN_LIBS}
+#		Qt5::Core
 		Qt5::Quick
 		Qt5::Widgets
 		Qt5::Qml
