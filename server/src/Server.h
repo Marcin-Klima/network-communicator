@@ -4,40 +4,26 @@
 
 #pragma once
 
-#include <boost/asio.hpp>
-#include <boost/thread/thread.hpp>
-
-#include <string>
 #include <QObject>
-#include "TerminalInterfaceServerMediator.h"
-
-
-using boost::asio::ip::tcp;
-
-class TerminalInterfaceServerMediator;
+#include <boost/thread/thread.hpp>
 
 class Server : public QObject
 {
-    Q_OBJECT
+Q_OBJECT
 
 public:
-    Server();
-
+    explicit Server();
     ~Server();
 
-    int Run();
+public slots:
+    void start();
+    void stop(QString& command);
 
-    void Halt();
-
-    void SetMediator(TerminalInterfaceServerMediator* terminalInterfaceServerMediator);
+signals:
+    void serverCreated();
 
 private:
-    void HandleNewConnection(boost::system::error_code errorCode, tcp::socket socket);
+    void run();
 
-    void AcceptNewConnections(tcp::acceptor& acceptor);
-
-    std::string makeDaytimeString();
-
-    boost::asio::io_service ioService;
-    TerminalInterfaceServerMediator* _mediator;
+    std::unique_ptr<boost::thread> _thread;
 };

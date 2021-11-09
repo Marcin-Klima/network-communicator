@@ -1,5 +1,5 @@
-import QtQuick 2.0
-import QtQuick.Controls 1.0
+import QtQuick 2.15
+import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.1
 import QtQuick.Controls.Styles 1.4
 
@@ -12,6 +12,13 @@ ApplicationWindow {
 
     onHeightChanged: {
         console.log("DUPA")
+    }
+
+    Connections {
+        target: server
+        function onServerCreated() {
+            outputTextArea.append("server has been created")
+        }
     }
 
     Rectangle {
@@ -33,26 +40,44 @@ ApplicationWindow {
                 Layout.fillWidth: true
 
                 TextArea {
+                    id: outputTextArea
                     anchors.fill: parent
                     anchors.margins: 3
                     font.pixelSize: 20
-                    text: "dupa"
                     wrapMode: Text.WordWrap
                     readOnly: true
-                    backgroundVisible: false
+                    color: "black"
                 }
             }
 
             Rectangle {
                 color: "#92e5a1"
+                Layout.maximumHeight: 70
                 Layout.fillHeight: true
                 Layout.fillWidth: true
 
                 TextArea {
+                    id: inputTextArea
                     font.pixelSize: 20
                     anchors.fill: parent
                     anchors.margins: 3
-                    backgroundVisible: false
+                    color: "black"
+
+                    Keys.onReturnPressed: {
+                        if(text.length > 0) {
+                            outputTextArea.append(">>>" + text)
+                            if(text[0] === '/') {
+                                if(text === "/start") {
+                                    server.start()
+                                }
+                                if(text === "/exit") {
+                                    ApplicationWindow.close()
+                                }
+                            }
+
+                            clear()
+                        }
+                    }
                 }
             }
 
