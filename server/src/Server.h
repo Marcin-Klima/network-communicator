@@ -9,21 +9,23 @@
 
 class Server : public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
     explicit Server();
     ~Server();
-
-public slots:
     void start();
-    void stop(QString& command);
 
 signals:
-    void serverCreated();
+    void printMessage(const QString& message);
+
+public slots:
+    void parseCommand(const QString& command);
+
 
 private:
-    void run();
+    void threadLoop();
+    void halt();
 
     std::unique_ptr<boost::thread> _thread;
 };

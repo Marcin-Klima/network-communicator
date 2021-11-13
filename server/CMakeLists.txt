@@ -1,7 +1,7 @@
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-qtquick_compiler_add_resources(QT_RESOURCES src/qml.qrc)
+qtquick_compiler_add_resources(QT_RESOURCES ui/qml.qrc)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
@@ -11,10 +11,8 @@ add_executable(klima-server ${QT_RESOURCES})
 target_sources(klima-server PRIVATE
 		src/main.cpp
 		src/Server.cpp
-		src/FrontendServerMediator.cpp
 
 		src/Server.h
-		src/FrontendServerMediator.h
 )
 
 target_compile_definitions(klima-server PRIVATE _WIN32_WINNT=0x0601)

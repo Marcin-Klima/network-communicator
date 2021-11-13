@@ -11,21 +11,11 @@ Server::Server()
 
 void Server::start()
 {
-    _thread = std::make_unique<boost::thread>(&Server::run, this);
+    _thread = std::make_unique<boost::thread>(&Server::threadLoop, this);
 }
 
-void Server::run()
+void Server::threadLoop()
 {
-    for(int i = 0; i < 5; ++i)
-    {
-        boost::this_thread::sleep_for(boost::chrono::seconds(1));
-        emit serverCreated();
-    }
-}
-
-void Server::stop(QString& command)
-{
-
 }
 
 Server::~Server()
@@ -34,4 +24,8 @@ Server::~Server()
     {
         _thread->join();
     }
+}
+
+void Server::halt()
+{
 }
