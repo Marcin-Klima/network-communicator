@@ -3,9 +3,6 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 qtquick_compiler_add_resources(QT_RESOURCES ui/qml.qrc)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
-
 add_executable(klima-server ${QT_RESOURCES})
 
 target_sources(klima-server PRIVATE
@@ -14,8 +11,6 @@ target_sources(klima-server PRIVATE
 
 		src/Server.h
 )
-
-target_compile_definitions(klima-server PRIVATE _WIN32_WINNT=0x0601)
 
 message(STATUS ${CONAN_LIBS})
 

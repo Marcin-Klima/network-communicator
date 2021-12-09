@@ -10,15 +10,9 @@ ApplicationWindow {
     title: qsTr("Minimal Qml")
     color: "#000000"
 
-    onHeightChanged: {
-        console.log("DUPA")
-    }
-
     Connections {
         target: server
-        function onServerCreated() {
-            outputTextArea.append("server has been created")
-        }
+
     }
 
     Rectangle {
@@ -65,16 +59,7 @@ ApplicationWindow {
 
                     Keys.onReturnPressed: {
                         if(text.length > 0) {
-                            outputTextArea.append(">>>" + text)
-                            if(text[0] === '/') {
-                                if(text === "/start") {
-                                    server.start()
-                                }
-                                if(text === "/exit") {
-                                    ApplicationWindow.close()
-                                }
-                            }
-
+                            server.receiveInputFromFrontent(text)
                             clear()
                         }
                     }

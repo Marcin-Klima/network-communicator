@@ -6,6 +6,9 @@
 
 #include <QObject>
 #include <boost/thread/thread.hpp>
+#include <boost/asio.hpp>
+
+using boost::asio::ip::tcp;
 
 class Server : public QObject
 {
@@ -14,18 +17,20 @@ class Server : public QObject
 public:
     explicit Server();
     ~Server();
-    void start();
 
 signals:
     void printMessage(const QString& message);
 
 public slots:
-    void parseCommand(const QString& command);
-
+    void receiveInputFromFrontent(const QString& input);
 
 private:
     void threadLoop();
     void halt();
+    void acceptNewConnection();
+
 
     std::unique_ptr<boost::thread> _thread;
+    boost::asio::io_context _io_context;
+    tcp::endpoint _endpoint;
 };
