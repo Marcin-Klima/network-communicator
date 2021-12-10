@@ -19,14 +19,18 @@ else()
 endif()
 
 if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
-	include(conan-debug/conanbuildinfo.cmake)
+	include(conanfiles/debug/conanbuildinfo.cmake)
 elseif(${CMAKE_BUILD_TYPE} MATCHES "Release")
-	include(conan-release/conanbuildinfo.cmake)
+	include(conanfiles/release/conanbuildinfo.cmake)
 endif()
 
 conan_basic_setup()
+set(CONAN_DISABLE_CHECK_COMPILER ON)
 
 find_package(Qt5 COMPONENTS Widgets Qml Quick QuickCompiler REQUIRED)
+if(NOT Qt5_FOUND)
+	message(FATAL_ERROR "Not found Qt5. Try adding Qt5 directory to your PATH.")
+endif()
 add_compile_options(${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS})
 
 add_subdirectory(server)
