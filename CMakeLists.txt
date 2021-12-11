@@ -4,6 +4,12 @@ project(network_communicator)
 
 set(CMAKE_CXX_STANDARD 20)
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	add_compile_definitions("SYS_WINDOWS")
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	add_compile_definitions("SYS_LINUX")
+endif()
+
 if (MSVC)
 	message(STATUS "DUPA")
 	add_compile_options(/W4 /WX)
@@ -24,8 +30,8 @@ elseif(${CMAKE_BUILD_TYPE} MATCHES "Release")
 	include(conanfiles/release/conanbuildinfo.cmake)
 endif()
 
-conan_basic_setup()
 set(CONAN_DISABLE_CHECK_COMPILER ON)
+conan_basic_setup()
 
 find_package(Qt5 COMPONENTS Widgets Qml Quick QuickCompiler REQUIRED)
 if(NOT Qt5_FOUND)

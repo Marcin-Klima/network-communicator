@@ -41,6 +41,7 @@ ApplicationWindow {
                     wrapMode: Text.WordWrap
                     readOnly: true
                     color: "black"
+                    background: Rectangle{color:"transparent"}
                 }
             }
 
@@ -56,6 +57,7 @@ ApplicationWindow {
                     anchors.fill: parent
                     anchors.margins: 3
                     color: "black"
+                    background: Rectangle{color:"transparent"}
 
                     Keys.onReturnPressed: {
                         if(text.length > 0) {
