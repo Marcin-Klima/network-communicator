@@ -15,10 +15,11 @@ int main()
         boost::asio::io_context io_context;
         tcp::resolver resolver(io_context);
         tcp::socket socket(io_context);
-        boost::asio::connect(socket, resolver.resolve("DESKTOP-SKA4OVV", "6969"));
+        boost::asio::connect(socket, resolver.resolve("waxta-laptop", "6969"));
     }
     catch(std::exception& exception)
     {
+        std::cout << "FAIL" << std::endl;
         std::cout << exception.what();
     }
 

@@ -12,8 +12,6 @@ target_sources(klima-server PRIVATE
 		src/Server.h
 )
 
-message(STATUS ${CONAN_LIBS})
-
 target_link_libraries(klima-server
 		${CONAN_LIBS}
 #		Qt5::Core
@@ -34,3 +32,5 @@ target_compile_definitions(klima-server PRIVATE
 		${QtQml_DEFINITIONS}
 		${${Qt5Quick_DEFINITIONS}}
 )
+
+include(example.cmake)
