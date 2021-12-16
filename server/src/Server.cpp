@@ -28,6 +28,7 @@ void Server::threadLoop()
 
 Server::~Server()
 {
+    _thread->join();
 }
 
 void Server::halt()
@@ -41,7 +42,7 @@ void Server::receiveInputFromFrontent(const QString& input)
     if (command.startsWith('/')) {
         command.remove(0, 1);
         if (command == "start") {
-            threadLoop();
+            _thread = std::make_unique<boost::thread>(&Server::threadLoop, this);
         }
         if (command == "halt") {
             _io_context.stop();
@@ -62,4 +63,4 @@ void Server::acceptNewConnection()
     });
 }
 
-// TODO: zrobić osobny wątek!!!
+// TODO: dodać zamykanie okna

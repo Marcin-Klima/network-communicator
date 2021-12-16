@@ -11,7 +11,6 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 endif()
 
 if (MSVC)
-	message(STATUS "DUPA")
 	add_compile_options(/W4 /WX)
 	add_compile_definitions(_WIN32_WINNT=0x0601)
 	if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
