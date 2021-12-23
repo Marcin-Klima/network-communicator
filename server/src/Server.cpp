@@ -4,6 +4,7 @@
 
 #include "Server.h"
 #include <boost/asio.hpp>
+#include <boost/log/trivial.hpp>
 #include <iostream>
 
 Server::Server() : _endpoint(tcp::v4(), 6969),
@@ -58,6 +59,7 @@ void Server::acceptNewConnection()
     _acceptor.async_accept([this](boost::system::error_code ec, tcp::socket socket) {
         if (!ec) {
             std::cout << "client connected from: " << socket.remote_endpoint().address().to_string() << std::endl;
+            BOOST_LOG_TRIVIAL(info) << "Client connected from: " << socket.remote_endpoint().address().to_string();
         }
         acceptNewConnection();
     });
