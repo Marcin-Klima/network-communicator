@@ -1,18 +1,28 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.1
-import QtQuick.Controls.Styles 1.4
+//import QtQuick.Controls.Styles 1.4
 
 ApplicationWindow {
+    id: mainWindow
     visible: true
     width: 1024
     height: 768
     title: qsTr("Minimal Qml")
     color: "#000000"
 
+    onClosing: {
+        server.halt()
+    }
+
     Connections {
         target: server
+        onServerStarted: {
+        }
 
+        onServerStopped: {
+            mainWindow.close()
+        }
     }
 
     Rectangle {
@@ -61,9 +71,12 @@ ApplicationWindow {
 
                     Keys.onReturnPressed: {
                         if(text.length > 0) {
-                            server.receiveInputFromFrontent(text)
+                            server.receiveInputFromFrontend(text)
                             clear()
                         }
+                    }
+                    Keys.onEnterPressed: {
+                        console.log("DUPAAA")
                     }
                 }
             }

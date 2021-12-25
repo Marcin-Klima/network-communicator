@@ -20,13 +20,16 @@ public:
 
 signals:
     void printMessage(const QString& message);
+    void serverStarted();
+    void serverStopped();
 
 public slots:
-    void receiveInputFromFrontent(const QString& input);
+    void receiveInputFromFrontend(const QString& input);
+    void halt();
+    void startServer():
 
 private:
     void threadLoop();
-    void halt();
     void acceptNewConnection();
 
     std::unique_ptr<boost::thread> _thread;

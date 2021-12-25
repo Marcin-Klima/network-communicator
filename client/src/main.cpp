@@ -13,10 +13,11 @@ int main()
 {
     try
     {
+        BOOST_LOG_TRIVIAL(info) << "Starting client";
         boost::asio::io_context io_context;
         tcp::resolver resolver(io_context);
         tcp::socket socket(io_context);
-        boost::asio::connect(socket, resolver.resolve("DESKTOP-SKA4OVV", "6969"));
+        boost::asio::connect(socket, resolver.resolve(boost::asio::ip::host_name(), "6969"));
     }
     catch(std::exception& exception)
     {

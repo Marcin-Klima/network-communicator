@@ -5,7 +5,6 @@
 #include "Server.h"
 #include <boost/asio.hpp>
 #include <boost/log/trivial.hpp>
-#include <iostream>
 
 Server::Server() : _endpoint(tcp::v4(), 6969),
                    _acceptor(_io_context, _endpoint)
@@ -16,37 +15,49 @@ Server::Server() : _endpoint(tcp::v4(), 6969),
 void Server::threadLoop()
 {
     try {
-        //run connectiojn acceptor
         acceptNewConnection();
 
-        std::cout << "running io_context" << std::endl;
         _io_context.run();
     }
     catch (std::exception& exception) {
-        std::cout << exception.what();
+        BOOST_LOG_TRIVIAL(error) << "!!!EXCEPTION: " << exception.what();
     }
 }
 
 Server::~Server()
 {
-    _thread->join();
+    if(_thread != nullptr && _thread->joinable())
+    {
+        _thread->join();
+    }
+}
+
+void Server::startServer()
+{
+    _thread = std::make_unique<boost::thread>(&Server::threadLoop, this);
+    emit serverStarted();
 }
 
 void Server::halt()
 {
+    if(!_io_context.stopped())
+    {
+        BOOST_LOG_TRIVIAL(info) << "Stopping server";
+        _io_context.stop();
+        emit serverStopped();
+    }
 }
 
-void Server::receiveInputFromFrontent(const QString& input)
+void Server::receiveInputFromFrontend(const QString& input)
 {
     QString command(input);
-    std::cout << "command: " << command.toStdString() << std::endl;
+    BOOST_LOG_TRIVIAL(debug) << "User command: " << input.toStdString();
     if (command.startsWith('/')) {
-        command.remove(0, 1);
-        if (command == "start") {
-            _thread = std::make_unique<boost::thread>(&Server::threadLoop, this);
+        if (command == "/start") {
+            startServer();
         }
-        if (command == "halt") {
-            _io_context.stop();
+        if (command == "/halt") {
+            halt();
         }
     } else {
 
@@ -55,14 +66,11 @@ void Server::receiveInputFromFrontent(const QString& input)
 
 void Server::acceptNewConnection()
 {
-    std::cout << "accepting new connection" << std::endl;
+    BOOST_LOG_TRIVIAL(trace) << "Accepting new connection";
     _acceptor.async_accept([this](boost::system::error_code ec, tcp::socket socket) {
         if (!ec) {
-            std::cout << "client connected from: " << socket.remote_endpoint().address().to_string() << std::endl;
             BOOST_LOG_TRIVIAL(info) << "Client connected from: " << socket.remote_endpoint().address().to_string();
         }
         acceptNewConnection();
     });
 }
-
-// TODO: dodać zamykanie okna
