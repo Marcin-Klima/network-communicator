@@ -26,7 +26,7 @@ signals:
 public slots:
     void receiveInputFromFrontend(const QString& input);
     void halt();
-    void startServer():
+    void startServer();
 
 private:
     void threadLoop();
