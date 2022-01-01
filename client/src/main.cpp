@@ -18,6 +18,13 @@ int main()
         tcp::resolver resolver(io_context);
         tcp::socket socket(io_context);
         boost::asio::connect(socket, resolver.resolve(boost::asio::ip::host_name(), "6969"));
+
+        std::string message;
+        while(message != "/close")
+        {
+            std::getline(std::cin, message);
+            boost::asio::write(socket, boost::asio::buffer(message));
+        }
     }
     catch(std::exception& exception)
     {

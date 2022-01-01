@@ -8,8 +8,10 @@ add_executable(klima-server ${QT_RESOURCES})
 target_sources(klima-server PRIVATE
 		src/main.cpp
 		src/Server.cpp
+		src/Session.cpp
 
 		src/Server.h
+		src/Session.h
 )
 
 target_link_libraries(klima-server

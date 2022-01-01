@@ -12,7 +12,7 @@ ApplicationWindow {
     color: "#000000"
 
     onClosing: {
-        server.halt()
+        server.stopServer()
     }
 
     Connections {

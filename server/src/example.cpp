@@ -1,7 +1,3 @@
-//
-// Created by waxta on 12.12.2021.
-//
-
 #include <cstdlib>
 #include <iostream>
 #include <memory>
@@ -29,11 +25,8 @@ private:
     {
         auto self(shared_from_this());
         socket_.async_read_some(boost::asio::buffer(data_, max_length),
-                                [this, self](boost::system::error_code ec, std::size_t length)
-                                {
-                                    if (!ec)
-                                    {
-                                        std::cout << "client sending: " << data_ << std::endl;
+                                [this, self](boost::system::error_code ec, std::size_t length) {
+                                    if (!ec) {
                                         do_write(length);
                                     }
                                 });
@@ -43,17 +36,18 @@ private:
     {
         auto self(shared_from_this());
         boost::asio::async_write(socket_, boost::asio::buffer(data_, length),
-                                 [this, self](boost::system::error_code ec, std::size_t /*length*/)
-                                 {
-                                     if (!ec)
-                                     {
+                                 [this, self](boost::system::error_code ec, std::size_t /*length*/) {
+                                     if (!ec) {
                                          do_read();
                                      }
                                  });
     }
 
     tcp::socket socket_;
-    enum { max_length = 1024 };
+    enum
+    {
+        max_length = 1024
+    };
     char data_[max_length];
 };
 
@@ -69,13 +63,9 @@ public:
 private:
     void do_accept()
     {
-        std::cout << "waiting for new client to connect." << std::endl;
         acceptor_.async_accept(
-                [this](boost::system::error_code ec, tcp::socket socket)
-                {
-                    if (!ec)
-                    {
-                        std::cout << "client address: " << socket.remote_endpoint().address().to_v4().to_string() << std::endl;
+                [this](boost::system::error_code ec, tcp::socket socket) {
+                    if (!ec) {
                         std::make_shared<session>(std::move(socket))->start();
                     }
 
@@ -88,10 +78,8 @@ private:
 
 int main(int argc, char* argv[])
 {
-    try
-    {
-        if (argc != 2)
-        {
+    try {
+        if (argc != 2) {
             std::cerr << "Usage: async_tcp_echo_server <port>\n";
             return 1;
         }
@@ -102,8 +90,7 @@ int main(int argc, char* argv[])
 
         io_context.run();
     }
-    catch (std::exception& e)
-    {
+    catch (std::exception& e) {
         std::cerr << "Exception: " << e.what() << "\n";
     }
 

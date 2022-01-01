@@ -25,13 +25,17 @@ signals:
 
 public slots:
     void receiveInputFromFrontend(const QString& input);
-    void halt();
+    void stopServer();
     void startServer();
+
+private slots:
+    void closeSession(size_t sessionId);
 
 private:
     void threadLoop();
     void acceptNewConnection();
 
+    std::list<std::unique_ptr<class Session>> _sessions;
     std::unique_ptr<boost::thread> _thread;
     boost::asio::io_context _io_context;
     tcp::endpoint _endpoint;
