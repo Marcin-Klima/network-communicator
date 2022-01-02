@@ -40,3 +40,4 @@ add_compile_options(${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS})
 
 add_subdirectory(server)
 add_subdirectory(client)
+add_subdirectory(frontend)
