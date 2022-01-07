@@ -9,9 +9,11 @@ target_sources(klima-server PRIVATE
 		src/main.cpp
 		src/Server.cpp
 		src/Session.cpp
+		src/Frontend.cpp
 
 		src/Server.h
 		src/Session.h
+		src/Frontend.h
 )
 
 target_link_libraries(klima-server
