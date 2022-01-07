@@ -11,7 +11,7 @@
 #include "Frontend.h"
 #include "Server.h"
 
-void Frontend::run(int argc, char** argv)
+void Frontend::run(int argc, char** argv, Server& server)
 {
     QApplication application(argc, argv);
     QQmlApplicationEngine engine;

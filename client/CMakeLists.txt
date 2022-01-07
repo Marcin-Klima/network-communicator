@@ -8,8 +8,10 @@ add_executable(klima-client ${QT_RESOURCES})
 target_sources(klima-client PRIVATE
 		src/main.cpp
 		src/Frontend.cpp
+		src/Backend.cpp
 
 		src/Frontend.h
+		src/Backend.h
 )
 
 target_link_libraries(klima-client

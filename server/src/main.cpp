@@ -9,7 +9,7 @@ int main(int argc, char** argv)
 
     Server server;
     Frontend frontend;
-    frontend.run(argc, argv);
+    frontend.run(argc, argv, server);
 
     return 0;
 }

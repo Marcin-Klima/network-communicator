@@ -10,7 +10,7 @@
 class Frontend
 {
 public:
-    void run(int argc, char** argv);
+    void run(int argc, char** argv, Server& server);
 
 
 private:

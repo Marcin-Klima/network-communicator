@@ -11,7 +11,10 @@ ApplicationWindow {
     title: qsTr("Minimal Qml")
     color: "#000000"
 
+//    Connections {
+//        target: backend
 
+//    }
 
     Rectangle {
         id: rectangle
@@ -59,6 +62,7 @@ ApplicationWindow {
 
                     Keys.onReturnPressed: {
                         if(text.length > 0) {
+                            backend.receiveInputFromFrontend(text)
                             clear()
                         }
                     }
