@@ -42,3 +42,8 @@ Backend::~Backend()
         _mainThread->join();
     }
 }
+
+void Backend::stopClientSession()
+{
+    boost::asio::write(_socket, boost::asio::buffer("/endsession"));
+}

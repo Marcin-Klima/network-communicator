@@ -27,6 +27,7 @@ signals:
 
 public slots:
     void receiveInputFromFrontend(const QString& string);
+    void stopClientSession();
 
 private:
     void threadFunction();

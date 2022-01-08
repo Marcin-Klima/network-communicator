@@ -9,38 +9,22 @@
 
 #include "Frontend.h"
 
-Frontend::Frontend(int argc, char** argv, Backend& backend) : _application(argc, argv), _backend(backend)
+Frontend::Frontend()
 {
 
 }
 
-void Frontend::run()
+void Frontend::run(int argc, char** argv, Backend& backend)
 {
+    QApplication application(argc, argv);
     QQmlApplicationEngine engine;
-    engine.rootContext()->setContextProperty("backend", &_backend);
+    engine.rootContext()->setContextProperty("backend", &backend);
 
-    connect(&engine, &QQmlApplicationEngine::objectCreated, this, &Frontend::mainWindowLoaded);
     BOOST_LOG_TRIVIAL(info) << "loading qml object tree";
 #ifdef SYS_WINDOWS
     engine.load(QUrl(QStringLiteral("qrc:\\main.qml")));
 #elif SYS_LINUX
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 #endif
-    BOOST_LOG_TRIVIAL(info) << "error!";
+    application.exec();
 }
-
-void Frontend::mainWindowLoaded(QObject* object, [[maybe_unused]] const QUrl& url)
-{
-    if(object != nullptr)
-    {
-        BOOST_LOG_TRIVIAL(info) << "object tree has been loaded";
-        _backend.run(); //works on separate thread!
-        _application.exec();
-    }
-    else
-    {
-        BOOST_LOG_TRIVIAL(error) << "object tree has not loaded correctly!";
-    }
-}
-
-
