@@ -6,6 +6,8 @@
 #include <boost/log/trivial.hpp>
 #include <boost/bind/bind.hpp>
 
+#include <string>
+
 Session::Session(tcp::socket socket, size_t sessionId) : _clientSocket(std::move(socket)), _sessionId(sessionId)
 {
     asyncAwaitForNewMessage();
@@ -26,7 +28,11 @@ void Session::messageHandler(boost::system::error_code errorCode, size_t message
     {
         std::string_view dataView(_data, messageLength);
         BOOST_LOG_TRIVIAL(info) << "client says: " << dataView;
-        if (dataView == "/close")
+        if(dataView == "dupa")
+        {
+            BOOST_LOG_TRIVIAL(trace) << "DSFSFSFSDFSF";
+        }
+        if (dataView == "/endsession")
         {
             BOOST_LOG_TRIVIAL(info) << "closing connection";
             _clientSocket.close();

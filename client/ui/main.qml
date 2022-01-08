@@ -11,6 +11,10 @@ ApplicationWindow {
     title: qsTr("Minimal Qml")
     color: "#000000"
 
+    onClosing: {
+        backend.stopClientSession()
+    }
+
 //    Connections {
 //        target: backend
 

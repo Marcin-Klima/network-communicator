@@ -13,13 +13,10 @@ class Frontend : public QObject
     Q_OBJECT
 
 public:
-    Frontend(int argc, char** argv, Backend& backend);
-    void run();
+    Frontend();
+    void run(int argc, char** argv, Backend& backend);
 
 private slots:
-    void mainWindowLoaded(QObject* object, const QUrl& url);
 
 private:
-    QApplication _application;
-    Backend& _backend;
 };
