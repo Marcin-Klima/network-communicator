@@ -5,6 +5,9 @@ qtquick_compiler_add_resources(QT_RESOURCES ui/qml.qrc)
 
 add_executable(klima-server ${QT_RESOURCES})
 
+get_target_property(SERVER_OPTIONS klima-server COMPILE_OPTIONS)
+message(STATUS "Compile options: ${SERVER_OPTIONS}")
+
 target_sources(klima-server PRIVATE
 		src/main.cpp
 		src/Server.cpp
@@ -36,5 +39,6 @@ target_compile_definitions(klima-server PRIVATE
 		${QtQml_DEFINITIONS}
 		${${Qt5Quick_DEFINITIONS}}
 )
+
 
 include(example.cmake)
