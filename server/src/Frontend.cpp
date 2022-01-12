@@ -17,6 +17,8 @@ void Frontend::run(int argc, char** argv, Server& server)
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("server", &server);
 
+    qRegisterMetaType<size_t>("size_t");
+
 #ifdef SYS_WINDOWS
     engine.load(QUrl(QStringLiteral("qrc:\\main.qml")));
 #elif SYS_LINUX

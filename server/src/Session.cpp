@@ -15,8 +15,6 @@ Session::Session(tcp::socket socket, size_t sessionId) : _clientSocket(std::move
 
 void Session::asyncAwaitForNewMessage()
 {
-    BOOST_LOG_TRIVIAL(trace) << "waiting for new messages";
-
     _clientSocket.async_read_some(boost::asio::buffer(_data, MAX_MESSAGE_LENGTH),
                                   boost::bind(&Session::messageHandler, this, boost::asio::placeholders::error,
                                               boost::asio::placeholders::bytes_transferred));
@@ -28,10 +26,7 @@ void Session::messageHandler(boost::system::error_code errorCode, size_t message
     {
         std::string_view dataView(_data, messageLength);
         BOOST_LOG_TRIVIAL(info) << "client says: " << dataView;
-        if(dataView == "dupa")
-        {
-            BOOST_LOG_TRIVIAL(trace) << "DSFSFSFSDFSF";
-        }
+
         if (dataView == "/endsession")
         {
             BOOST_LOG_TRIVIAL(info) << "closing connection";

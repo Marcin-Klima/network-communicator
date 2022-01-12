@@ -47,6 +47,7 @@ void Backend::stopClientSession()
 {
     if(_socket.is_open())
     {
-        boost::asio::write(_socket, boost::asio::buffer("/endsession"));
+        const std::string message("/endsession");
+        boost::asio::write(_socket, boost::asio::buffer(message, message.length()));
     }
 }
