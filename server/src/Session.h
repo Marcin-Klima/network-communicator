@@ -5,31 +5,26 @@
 #pragma once
 
 #include <boost/asio.hpp>
-#include <QObject>
+#include "Server.h"
 
 using boost::asio::ip::tcp;
 
-class Session : public QObject
+class Session
 {
-    Q_OBJECT
-
     enum
     {
         MAX_MESSAGE_LENGTH = 1024
     };
 
 public:
-    Session(tcp::socket socket, size_t sessionId);
+    Session(Server& server, tcp::socket socket);
     ~Session();
-
-signals:
-    void sessionClosed(size_t sessionId);
 
 private:
     void asyncAwaitForNewMessage();
     void messageHandler(boost::system::error_code errorCode, size_t messageLength);
 
+    Server& _server;
     tcp::socket _clientSocket;
     char _data[MAX_MESSAGE_LENGTH];
-    const size_t _sessionId;
 };

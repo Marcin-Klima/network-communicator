@@ -49,8 +49,6 @@ void Server::stopServer()
     if (!_io_context.stopped())
     {
         BOOST_LOG_TRIVIAL(info) << "Stopping server";
-        BOOST_LOG_TRIVIAL(info) << "opened sessions: " << _sessions.size();
-        _sessions.clear();
         _io_context.stop();
         emit serverStopped();
     }
@@ -82,15 +80,15 @@ void Server::acceptNewConnection()
         {
             BOOST_LOG_TRIVIAL(info) << "client connected from ip address: "
                                     << clientSocket.remote_endpoint().address().to_v4().to_string();
-            auto newSession = std::make_unique<Session>(std::move(clientSocket), _sessions.size());
-            connect(newSession.get(), &Session::sessionClosed, this, &Server::closeSession);
-            _sessions.push_back(std::move(newSession));
+            auto newSession = std::make_unique<Session>(*this, std::move(clientSocket));
+            _sessions[newSession.get()] = std::move(newSession);
         }
         acceptNewConnection();
     });
 }
 
-void Server::closeSession(size_t sessionId)
+void Server::closeSession(Session* session)
 {
-    BOOST_LOG_TRIVIAL(info) << "removing session:" << sessionId;
+    BOOST_LOG_TRIVIAL(info) << "removing session";
+    _sessions.erase(session);
 }

@@ -14,6 +14,8 @@ class Server : public QObject
 {
     Q_OBJECT
 
+    friend class Session;
+
 public:
     explicit Server();
     ~Server();
@@ -29,13 +31,13 @@ public slots:
     void startServer();
 
 private slots:
-    void closeSession(size_t sessionId);
+    void closeSession(Session* session);
 
 private:
     void threadLoop();
     void acceptNewConnection();
 
-    std::list<std::unique_ptr<class Session>> _sessions;
+    std::map<class Session*, std::shared_ptr<Session>> _sessions;
     std::unique_ptr<boost::thread> _thread;
     boost::asio::io_context _io_context;
     tcp::endpoint _endpoint;

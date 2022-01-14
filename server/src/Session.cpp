@@ -8,7 +8,9 @@
 
 #include <string>
 
-Session::Session(tcp::socket socket, size_t sessionId) : _clientSocket(std::move(socket)), _sessionId(sessionId)
+Session::Session(Server& server, tcp::socket socket) :
+        _server(server),
+        _clientSocket(std::move(socket))
 {
     asyncAwaitForNewMessage();
 }
@@ -31,7 +33,7 @@ void Session::messageHandler(boost::system::error_code errorCode, size_t message
         {
             BOOST_LOG_TRIVIAL(info) << "closing connection";
             _clientSocket.close();
-            emit sessionClosed(_sessionId);
+            _server.closeSession(this);
         } else
         {
             asyncAwaitForNewMessage();
