@@ -10,6 +10,8 @@
 
 using boost::asio::ip::tcp;
 
+class Session;
+
 class Server : public QObject
 {
     Q_OBJECT
@@ -37,7 +39,7 @@ private:
     void threadLoop();
     void acceptNewConnection();
 
-    std::map<class Session*, std::shared_ptr<Session>> _sessions;
+    std::map<Session*, std::shared_ptr<Session>> _sessions;
     std::unique_ptr<boost::thread> _thread;
     boost::asio::io_context _io_context;
     tcp::endpoint _endpoint;

@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>MessageHistoryBox.qml</file>
-        <file>MessageInputBox.qml</file>
+        <file>components/MessageInputBox.qml</file>
+        <file>components/MessageHistoryBox.qml</file>
     </qresource>
 </RCC>

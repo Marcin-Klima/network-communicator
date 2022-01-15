@@ -2,8 +2,8 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.1
 
-import "./MessageHistoryBox.qml"
-import "./MessageInputBox.qml"
+import "components"
+//import "./components/MessageInputBox.qml" as MessageInputBox
 
 ApplicationWindow {
     id: mainWindow
@@ -31,9 +31,7 @@ ApplicationWindow {
         id: mainContainer
         color: "#000000"
         anchors.fill: parent
-        anchors.margins: 5
-        border.color: "#b42240"
-        border.width: 3
+        anchors.margins: 12
 
         GridLayout {
             anchors.fill: parent
@@ -41,17 +39,34 @@ ApplicationWindow {
             rows: 2
 
             Rectangle {
+                id: leftBox
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 Layout.rowSpan: 2
-            }
 
+                ColumnLayout {
+                    anchors.fill: parent
+
+                    Button {
+                        text: "TEST1"
+                        height: 100
+//                        anchors.fill: parent
+                    }
+
+                    Button {
+                        text: "TEST2"
+                        height: 100
+//                        anchors.fill: parent
+                    }
+                }
+            }
 
             MessageHistoryBox {
                 id: messageHistoryBox
             }
 
             Rectangle {
+                id: rightBox
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 Layout.rowSpan: 2
@@ -60,13 +75,6 @@ ApplicationWindow {
             MessageInputBox {
                 id: messageInputBox
             }
-
         }
     }
 }
-
-/*##^##
-Designer {
-    D{i:0;formeditorZoom:0.9}
-}
-##^##*/
