@@ -1,14 +1,16 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.1
-//import QtQuick.Controls.Styles 1.4
+
+import "./MessageHistoryBox.qml"
+import "./MessageInputBox.qml"
 
 ApplicationWindow {
     id: mainWindow
     visible: true
     width: 1024
     height: 768
-    title: qsTr("Minimal Qml")
+    title: qsTr("Server")
     color: "#000000"
 
     onClosing: {
@@ -26,59 +28,37 @@ ApplicationWindow {
     }
 
     Rectangle {
-        id: rectangle
+        id: mainContainer
         color: "#000000"
         anchors.fill: parent
         anchors.margins: 5
-        border.color: "#22b455"
+        border.color: "#b42240"
         border.width: 3
 
-        ColumnLayout {
+        GridLayout {
             anchors.fill: parent
-            anchors.margins: 10
-
+            columns: 3
+            rows: 2
 
             Rectangle {
-                color: "#204829"
                 Layout.fillHeight: true
                 Layout.fillWidth: true
+                Layout.rowSpan: 2
+            }
 
-                TextArea {
-                    id: outputTextArea
-                    anchors.fill: parent
-                    anchors.margins: 3
-                    font.pixelSize: 20
-                    wrapMode: Text.WordWrap
-                    readOnly: true
-                    color: "black"
-                    background: Rectangle{color:"transparent"}
-                }
+
+            MessageHistoryBox {
+                id: messageHistoryBox
             }
 
             Rectangle {
-                color: "#92e5a1"
-                Layout.maximumHeight: 70
                 Layout.fillHeight: true
                 Layout.fillWidth: true
+                Layout.rowSpan: 2
+            }
 
-                TextArea {
-                    id: inputTextArea
-                    font.pixelSize: 20
-                    anchors.fill: parent
-                    anchors.margins: 3
-                    color: "black"
-                    background: Rectangle{color:"transparent"}
-
-                    Keys.onReturnPressed: {
-                        if(text.length > 0) {
-                            server.receiveInputFromFrontend(text)
-                            clear()
-                        }
-                    }
-                    Keys.onEnterPressed: {
-                        console.log("DUPAAA")
-                    }
-                }
+            MessageInputBox {
+                id: messageInputBox
             }
 
         }

@@ -1,5 +1,7 @@
 <RCC>
-    <qresource>
+    <qresource prefix="/">
         <file>main.qml</file>
+        <file>MessageHistoryBox.qml</file>
+        <file>MessageInputBox.qml</file>
     </qresource>
 </RCC>

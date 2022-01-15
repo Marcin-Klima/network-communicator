@@ -8,7 +8,7 @@ ApplicationWindow {
     visible: true
     width: 1024
     height: 768
-    title: qsTr("Minimal Qml")
+    title: qsTr("Client")
     color: "#000000"
 
     onClosing: {
