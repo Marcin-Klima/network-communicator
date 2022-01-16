@@ -3,7 +3,6 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.1
 
 import "components"
-//import "./components/MessageInputBox.qml" as MessageInputBox
 
 ApplicationWindow {
     id: mainWindow
