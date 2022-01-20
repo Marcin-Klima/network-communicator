@@ -17,13 +17,15 @@ void Frontend::run(int argc, char** argv, Server& server)
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("server", &server);
 
-    qRegisterMetaType<size_t>("size_t");
-
-#ifdef SYS_WINDOWS
+    connect(&engine, &QQmlApplicationEngine::objectCreated, &application,
+            [](QObject* object, [[maybe_unused]] const QUrl& objUrl) {
+                if (object == nullptr)
+                {
+                    BOOST_LOG_TRIVIAL(error) << "error while loading frontend. Closing application";
+                    QApplication::exit(-100);
+                }
+            }, Qt::QueuedConnection);
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
-#elif SYS_LINUX
-    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
-#endif
 
     application.exec();
 }

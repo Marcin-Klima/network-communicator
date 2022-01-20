@@ -4,11 +4,12 @@
 
 #pragma once
 
-
 #include "Server.h"
+#include <QObject>
 
-class Frontend
+class Frontend : public QObject
 {
+    Q_OBJECT
 public:
     void run(int argc, char** argv, Server& server);
 
