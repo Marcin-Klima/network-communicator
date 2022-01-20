@@ -38,26 +38,51 @@ ApplicationWindow {
             rows: 2
 
             Rectangle {
-                id: leftBox
+                id: statusBar
+                Layout.maximumHeight: 50
+                Layout.columnSpan: 3
                 Layout.fillHeight: true
                 Layout.fillWidth: true
-                Layout.rowSpan: 2
 
-                ColumnLayout {
-                    anchors.fill: parent
-
+                RowLayout {
+                    height: parent.height
+                    spacing: 0
                     Button {
-                        text: "TEST1"
-                        height: 100
-//                        anchors.fill: parent
+                        font.pointSize: 11
+                        text: qsTr("START")
+                        Layout.maximumWidth: 100
+                        Layout.fillHeight: true
+                        palette.button: "#52cc6e"
+                    }
+                    Button {
+                        font.pointSize: 11
+                        text: qsTr("STOP")
+                        Layout.maximumWidth: 100
+                        Layout.fillHeight: true
+                        palette.button: "#cc5262"
                     }
 
-                    Button {
-                        text: "TEST2"
-                        height: 100
-//                        anchors.fill: parent
+                    Text {
+                        text: qsTr("status:")
+                        font.pointSize: 11
+                        Layout.leftMargin: 20
+                        Layout.margins: -1
+                    }
+                    Text {
+                        text: qsTr("shutdown")
+                        font.pointSize: 11
+                        Layout.leftMargin: 20
+                        Layout.margins: -1
                     }
                 }
+            }
+
+            Rectangle {
+                id: leftBox
+                color: "#00000000"
+                Layout.fillHeight: true
+                Layout.minimumWidth: 200
+                Layout.rowSpan: 2
             }
 
             MessageHistoryBox {
@@ -66,8 +91,10 @@ ApplicationWindow {
 
             Rectangle {
                 id: rightBox
+                color: "#00000000"
                 Layout.fillHeight: true
                 Layout.fillWidth: true
+                Layout.maximumWidth: 200
                 Layout.rowSpan: 2
             }
 

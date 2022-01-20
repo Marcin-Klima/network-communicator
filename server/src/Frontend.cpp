@@ -20,7 +20,7 @@ void Frontend::run(int argc, char** argv, Server& server)
     qRegisterMetaType<size_t>("size_t");
 
 #ifdef SYS_WINDOWS
-    engine.load(QUrl(QStringLiteral("qrc:///main.qml")));
+    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 #elif SYS_LINUX
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 #endif
