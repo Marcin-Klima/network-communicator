@@ -7,6 +7,10 @@ Rectangle {
     Layout.fillHeight: true
     Layout.fillWidth: true
 
+    function appendText(stringToAppend){
+        outputTextArea.text = outputTextArea.text + stringToAppend
+    }
+
     TextArea {
         id: outputTextArea
         anchors.fill: parent

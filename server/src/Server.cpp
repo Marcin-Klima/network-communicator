@@ -78,6 +78,7 @@ void Server::acceptNewConnection()
                                     << clientSocket.remote_endpoint().address().to_v4().to_string();
             auto newSession = std::make_unique<Session>(*this, std::move(clientSocket));
             _sessions[newSession.get()] = std::move(newSession);
+            emit printMessage("client connected");
             emit clientConnected("test-client");
         }
         acceptNewConnection();
