@@ -3,5 +3,7 @@
         <file>main.qml</file>
         <file>components/MessageInputBox.qml</file>
         <file>components/MessageHistoryBox.qml</file>
+        <file>components/Backend.qml</file>
+        <file>components/StatusBar.qml</file>
     </qresource>
 </RCC>

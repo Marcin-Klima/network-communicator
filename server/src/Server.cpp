@@ -10,7 +10,7 @@
 #include <memory>
 
 Server::Server() : _endpoint(tcp::v4(), 6969),
-                   _acceptor(_io_context, _endpoint)
+                   _acceptor(_io_context, _endpoint), _running(false)
 {
 
 }
@@ -39,17 +39,26 @@ Server::~Server()
 
 void Server::startServer()
 {
-    BOOST_LOG_TRIVIAL(info) << "starting server";
-    _thread = std::make_unique<boost::thread>(&Server::threadLoop, this);
-    emit serverStarted();
+    if (!_running)
+    {
+        BOOST_LOG_TRIVIAL(info) << "Starting server";
+        _running = true;
+        _io_context.restart();
+        _thread = std::make_unique<boost::thread>(&Server::threadLoop, this);
+        emit serverStarted();
+    }
 }
 
 void Server::stopServer()
 {
-    if (!_io_context.stopped())
+    if (_running)
     {
         BOOST_LOG_TRIVIAL(info) << "Stopping server";
         _io_context.stop();
+        _sessions.clear();
+        _thread->join();
+        _thread.reset(nullptr);
+        _running = false;
         emit serverStopped();
     }
 }
@@ -57,20 +66,7 @@ void Server::stopServer()
 void Server::receiveInputFromFrontend(const QString& input)
 {
     QString command(input);
-    if (command.startsWith('/'))
-    {
-        if (command == "/start")
-        {
-            startServer();
-        }
-        if (command == "/halt")
-        {
-            stopServer();
-        }
-    } else
-    {
 
-    }
 }
 
 void Server::acceptNewConnection()
@@ -82,13 +78,20 @@ void Server::acceptNewConnection()
                                     << clientSocket.remote_endpoint().address().to_v4().to_string();
             auto newSession = std::make_unique<Session>(*this, std::move(clientSocket));
             _sessions[newSession.get()] = std::move(newSession);
+            emit clientConnected("test-client");
         }
         acceptNewConnection();
     });
+
 }
 
 void Server::closeSession(Session* session)
 {
     BOOST_LOG_TRIVIAL(info) << "removing session";
     _sessions.erase(session);
+}
+
+void Server::testSlot()
+{
+    BOOST_LOG_TRIVIAL(info) << "TEST TEST";
 }

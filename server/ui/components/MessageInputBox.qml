@@ -18,12 +18,9 @@ Rectangle {
 
         Keys.onReturnPressed: {
             if(text.length > 0) {
-                server.receiveInputFromFrontend(text)
+                backend.receiveInputFromFrontend(text)
                 clear()
             }
-        }
-        Keys.onEnterPressed: {
-            console.log("DUPAAA")
         }
     }
 }

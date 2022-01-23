@@ -13,16 +13,27 @@ ApplicationWindow {
     color: "#000000"
 
     onClosing: {
-        server.stopServer()
+        backend.stopServer()
+    }
+
+    Backend {
+        id: backendComponent
     }
 
     Connections {
-        target: server
-        onServerStarted: {
-        }
+        target: backend
+        onPrintMessage: {
 
+        }
+        onServerStarted: {
+            backendComponent.isRunning = true
+        }
         onServerStopped: {
-            mainWindow.close()
+            backendComponent.isRunning = false
+            backendComponent.clientsConnected = 0
+        }
+        onClientConnected: {
+            backendComponent.clientsConnected++
         }
     }
 
@@ -37,44 +48,8 @@ ApplicationWindow {
             columns: 3
             rows: 2
 
-            Rectangle {
+            StatusBar {
                 id: statusBar
-                Layout.maximumHeight: 50
-                Layout.columnSpan: 3
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-
-                RowLayout {
-                    height: parent.height
-                    spacing: 0
-                    Button {
-                        font.pointSize: 11
-                        text: qsTr("START")
-                        Layout.maximumWidth: 100
-                        Layout.fillHeight: true
-                        palette.button: "#52cc6e"
-                    }
-                    Button {
-                        font.pointSize: 11
-                        text: qsTr("STOP")
-                        Layout.maximumWidth: 100
-                        Layout.fillHeight: true
-                        palette.button: "#cc5262"
-                    }
-
-                    Text {
-                        text: qsTr("status:")
-                        font.pointSize: 11
-                        Layout.leftMargin: 20
-                        Layout.margins: -1
-                    }
-                    Text {
-                        text: qsTr("shutdown")
-                        font.pointSize: 11
-                        Layout.leftMargin: 20
-                        Layout.margins: -1
-                    }
-                }
             }
 
             Rectangle {

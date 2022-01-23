@@ -26,11 +26,13 @@ signals:
     void printMessage(const QString& message);
     void serverStarted();
     void serverStopped();
+    void clientConnected(const QString& userName);
 
 public slots:
     void receiveInputFromFrontend(const QString& input);
-    void stopServer();
     void startServer();
+    void stopServer();
+    void testSlot();
 
 private slots:
     void closeSession(Session* session);
@@ -44,4 +46,5 @@ private:
     boost::asio::io_context _io_context;
     tcp::endpoint _endpoint;
     tcp::acceptor _acceptor;
+    bool _running;
 };
