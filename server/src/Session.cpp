@@ -36,6 +36,7 @@ void Session::messageHandler(boost::system::error_code errorCode, size_t message
             _server.closeSession(this);
         } else
         {
+            _server.processMessageFromClient(_data);
             asyncAwaitForNewMessage();
         }
     }

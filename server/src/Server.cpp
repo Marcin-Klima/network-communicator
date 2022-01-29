@@ -78,7 +78,6 @@ void Server::acceptNewConnection()
                                     << clientSocket.remote_endpoint().address().to_v4().to_string();
             auto newSession = std::make_unique<Session>(*this, std::move(clientSocket));
             _sessions[newSession.get()] = std::move(newSession);
-            emit printMessage("client connected");
             emit clientConnected("test-client");
         }
         acceptNewConnection();
@@ -95,4 +94,9 @@ void Server::closeSession(Session* session)
 void Server::testSlot()
 {
     BOOST_LOG_TRIVIAL(info) << "TEST TEST";
+}
+
+void Server::processMessageFromClient(const QString& message)
+{
+    emit printMessage(message);
 }

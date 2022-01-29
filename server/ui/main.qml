@@ -54,7 +54,7 @@ ApplicationWindow {
 
             Rectangle {
                 id: leftBox
-                color: "#00000000"
+                color: "#000000"
                 Layout.fillHeight: true
                 Layout.minimumWidth: 200
                 Layout.rowSpan: 2

@@ -21,6 +21,7 @@ class Server : public QObject
 public:
     explicit Server();
     ~Server();
+    void processMessageFromClient(const QString& message);
 
 signals:
     void printMessage(const QString& message);
