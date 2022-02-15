@@ -35,6 +35,9 @@ ApplicationWindow {
         onClientConnected: {
             backendComponent.clientsConnected++
         }
+        onClientDisconnected: {
+            backendComponent.clientsConnected--
+        }
     }
 
     Rectangle {

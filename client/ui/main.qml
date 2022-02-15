@@ -11,15 +11,6 @@ ApplicationWindow {
     title: qsTr("Client")
     color: "#000000"
 
-    onClosing: {
-        backend.stopClientSession()
-    }
-
-//    Connections {
-//        target: backend
-
-//    }
-
     Rectangle {
         id: rectangle
         color: "#000000"

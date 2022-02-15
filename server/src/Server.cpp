@@ -71,24 +71,26 @@ void Server::receiveInputFromFrontend(const QString& input)
 
 void Server::acceptNewConnection()
 {
+
     _acceptor.async_accept([this](boost::system::error_code ec, tcp::socket clientSocket) {
         if (!ec)
         {
             BOOST_LOG_TRIVIAL(info) << "client connected from ip address: "
                                     << clientSocket.remote_endpoint().address().to_v4().to_string();
-            auto newSession = std::make_unique<Session>(*this, std::move(clientSocket));
-            _sessions[newSession.get()] = std::move(newSession);
-            emit clientConnected("test-client");
+            auto clientSession = Session::create(*this, std::move(clientSocket));
+            _sessions.push_back(clientSession);
+            clientSession->open();
+            emit clientConnected();
         }
         acceptNewConnection();
     });
-
 }
 
-void Server::closeSession(Session* session)
+void Server::closeSession(std::shared_ptr<Session> session)
 {
     BOOST_LOG_TRIVIAL(info) << "removing session";
-    _sessions.erase(session);
+    _sessions.erase(std::find(_sessions.begin(), _sessions.end(), session));
+    emit clientDisconnected();
 }
 
 void Server::testSlot()

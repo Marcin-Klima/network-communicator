@@ -9,7 +9,7 @@
 
 using boost::asio::ip::tcp;
 
-class Session
+class Session : public std::enable_shared_from_this<Session>
 {
     enum
     {
@@ -17,11 +17,13 @@ class Session
     };
 
 public:
-    Session(Server& server, tcp::socket socket);
+    static std::shared_ptr<Session> create(Server& server, tcp::socket socket);
     ~Session();
+    void open();
 
 private:
-    void asyncAwaitForNewMessage();
+    Session(Server& server, tcp::socket socket);
+    void asyncAwaitForNewMessage(std::shared_ptr<Session> self);
     void messageHandler(boost::system::error_code errorCode, size_t messageLength);
 
     Server& _server;

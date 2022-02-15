@@ -27,7 +27,8 @@ signals:
     void printMessage(const QString& message);
     void serverStarted();
     void serverStopped();
-    void clientConnected(const QString& userName);
+    void clientConnected();
+    void clientDisconnected();
 
 public slots:
     void receiveInputFromFrontend(const QString& input);
@@ -36,13 +37,13 @@ public slots:
     void testSlot();
 
 private slots:
-    void closeSession(Session* session);
+    void closeSession(std::shared_ptr<Session> session);
 
 private:
     void threadLoop();
     void acceptNewConnection();
 
-    std::map<Session*, std::shared_ptr<Session>> _sessions;
+    std::list<std::shared_ptr<Session>> _sessions;
     std::unique_ptr<boost::thread> _thread;
     boost::asio::io_context _io_context;
     tcp::endpoint _endpoint;
