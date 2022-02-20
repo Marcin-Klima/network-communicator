@@ -21,9 +21,10 @@ public:
     ~Session();
     void open();
 
+
 private:
     Session(Server& server, tcp::socket socket);
-    void asyncAwaitForNewMessage(std::shared_ptr<Session> self);
+    void asyncAwaitForNewMessage();
     void messageHandler(boost::system::error_code errorCode, size_t messageLength);
 
     Server& _server;

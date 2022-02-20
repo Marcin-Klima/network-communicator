@@ -13,15 +13,16 @@ Session::Session(Server& server, tcp::socket socket) :
         _clientSocket(std::move(socket))
 {
     BOOST_LOG_TRIVIAL(debug) << "konstruktor";
+    memset(_data, 0, MAX_MESSAGE_LENGTH);
 }
 
 void Session::open()
 {
-    asyncAwaitForNewMessage(shared_from_this());
+    asyncAwaitForNewMessage();
 }
 
 
-void Session::asyncAwaitForNewMessage(std::shared_ptr<Session> self)
+void Session::asyncAwaitForNewMessage()
 {
     //boost::bind has the ability to bind function with shared_poniter of T class as *this* pointer
     _clientSocket.async_read_some(boost::asio::buffer(_data, MAX_MESSAGE_LENGTH),
@@ -36,25 +37,22 @@ void Session::messageHandler(boost::system::error_code errorCode, size_t message
         std::string_view dataView(_data, messageLength);
         BOOST_LOG_TRIVIAL(info) << "client says: " << dataView;
 
-        _server.processMessageFromClient(_data);
-        asyncAwaitForNewMessage(shared_from_this());
+        _server.processMessageFromClient(shared_from_this(), _data);
+        memset(_data, 0, MAX_MESSAGE_LENGTH);
+        asyncAwaitForNewMessage();
     }
     else if(errorCode == boost::asio::error::eof)
     {
-        BOOST_LOG_TRIVIAL(info) << "closing connection";
         _clientSocket.close();
         _server.closeSession(shared_from_this());
-        BOOST_LOG_TRIVIAL(debug) << "after server removed session from map";
     }
 }
 
 Session::~Session()
 {
-    BOOST_LOG_TRIVIAL(debug) << "session's dctor";
 }
 
 std::shared_ptr<Session> Session::create(Server& server, tcp::socket socket)
 {
     return std::shared_ptr<Session>(new Session(server, std::move(socket)));
 }
-

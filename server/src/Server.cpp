@@ -88,7 +88,6 @@ void Server::acceptNewConnection()
 
 void Server::closeSession(std::shared_ptr<Session> session)
 {
-    BOOST_LOG_TRIVIAL(info) << "removing session";
     _sessions.erase(std::find(_sessions.begin(), _sessions.end(), session));
     emit clientDisconnected();
 }
@@ -98,7 +97,15 @@ void Server::testSlot()
     BOOST_LOG_TRIVIAL(info) << "TEST TEST";
 }
 
-void Server::processMessageFromClient(const QString& message)
+void Server::processMessageFromClient(std::shared_ptr<Session> sender, const QString& message)
 {
+    for(auto session : _sessions)
+    {
+        if(session != sender)
+        {
+            //todo: komunikacja pomiedzy sesjami!!!!
+
+        }
+    }
     emit printMessage(message);
 }
