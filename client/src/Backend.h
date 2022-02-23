@@ -24,16 +24,21 @@ public:
     void run();
 
 signals:
+    void messageReceived(const QString& message);
 
 public slots:
     void receiveInputFromFrontend(const QString& string);
-    void stopClientSession();
+    void stop();
 
 private:
     void threadFunction();
+    void readMessage();
+    void resolveHandler(boost::system::error_code ec, tcp::resolver::results_type result);
+
 
     std::unique_ptr<boost::thread> _mainThread;
     boost::asio::io_context _ioContext;
     tcp::socket _socket;
+    char _buffer[1024] = {0};
 };
 

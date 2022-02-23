@@ -8,12 +8,11 @@
 
 #include <string>
 
-Session::Session(Server& server, tcp::socket socket) :
-        _server(server),
-        _clientSocket(std::move(socket))
+Session::Session(std::list<std::shared_ptr<Session>>& sessions, tcp::socket socket) :
+        _sessionList(sessions),
+        _socket(std::move(socket))
 {
     BOOST_LOG_TRIVIAL(debug) << "konstruktor";
-    memset(_data, 0, MAX_MESSAGE_LENGTH);
 }
 
 void Session::open()
@@ -25,34 +24,51 @@ void Session::open()
 void Session::asyncAwaitForNewMessage()
 {
     //boost::bind has the ability to bind function with shared_poniter of T class as *this* pointer
-    _clientSocket.async_read_some(boost::asio::buffer(_data, MAX_MESSAGE_LENGTH),
-                                  boost::bind(&Session::messageHandler, shared_from_this(), boost::asio::placeholders::error,
-                                              boost::asio::placeholders::bytes_transferred));
+    _socket.async_read_some(boost::asio::buffer(_data, MAX_MESSAGE_LENGTH),
+                            boost::bind(&Session::readHandler, shared_from_this(),
+                                        boost::asio::placeholders::error,
+                                        boost::asio::placeholders::bytes_transferred));
 }
 
-void Session::messageHandler(boost::system::error_code errorCode, size_t messageLength)
+void Session::readHandler(boost::system::error_code errorCode, size_t messageLength)
 {
     if (!errorCode)
     {
         std::string_view dataView(_data, messageLength);
         BOOST_LOG_TRIVIAL(info) << "client says: " << dataView;
 
-        _server.processMessageFromClient(shared_from_this(), _data);
+        for (auto otherSession: _sessionList)
+        {
+            if (otherSession != shared_from_this())
+            {
+                otherSession->_socket.async_send(boost::asio::buffer(_data, messageLength),
+                                                 []([[maybe_unused]]
+                boost::system::error_code ec, [[maybe_unused]] std::size_t bytes_transferred) {
+                    if(!ec)
+                    {
+                        BOOST_LOG_TRIVIAL(info) << "OK! bytes transferred: " << bytes_transferred;
+                    }
+                });
+            }
+        }
+
         memset(_data, 0, MAX_MESSAGE_LENGTH);
         asyncAwaitForNewMessage();
     }
-    else if(errorCode == boost::asio::error::eof)
+    else if (errorCode == boost::asio::error::eof)
     {
-        _clientSocket.close();
-        _server.closeSession(shared_from_this());
+        BOOST_LOG_TRIVIAL(debug) << "SOCKET'S EOF";
+        _socket.close();
+        _sessionList.erase(std::find(_sessionList.begin(), _sessionList.end(), shared_from_this()));
     }
 }
 
 Session::~Session()
 {
+    BOOST_LOG_TRIVIAL(debug) << "session's destructor";
 }
 
-std::shared_ptr<Session> Session::create(Server& server, tcp::socket socket)
+std::shared_ptr<Session> Session::create(std::list<std::shared_ptr<Session>>& sessions, tcp::socket socket)
 {
-    return std::shared_ptr<Session>(new Session(server, std::move(socket)));
+    return std::shared_ptr<Session>(new Session(sessions, std::move(socket)));
 }

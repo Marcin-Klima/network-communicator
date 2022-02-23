@@ -10,7 +10,7 @@
 #include <memory>
 
 Server::Server() : _endpoint(tcp::v4(), 6969),
-                   _acceptor(_io_context, _endpoint), _running(false)
+                   _acceptor(_ioContext, _endpoint), _running(false)
 {
 
 }
@@ -21,7 +21,7 @@ void Server::threadLoop()
     {
         acceptNewConnection();
 
-        _io_context.run();
+        _ioContext.run();
     }
     catch (std::exception& exception)
     {
@@ -43,7 +43,7 @@ void Server::startServer()
     {
         BOOST_LOG_TRIVIAL(info) << "Starting server";
         _running = true;
-        _io_context.restart();
+        _ioContext.restart();
         _thread = std::make_unique<boost::thread>(&Server::threadLoop, this);
         emit serverStarted();
     }
@@ -54,7 +54,7 @@ void Server::stopServer()
     if (_running)
     {
         BOOST_LOG_TRIVIAL(info) << "Stopping server";
-        _io_context.stop();
+        _ioContext.stop();
         _sessions.clear();
         _thread->join();
         _thread.reset(nullptr);
@@ -77,7 +77,7 @@ void Server::acceptNewConnection()
         {
             BOOST_LOG_TRIVIAL(info) << "client connected from ip address: "
                                     << clientSocket.remote_endpoint().address().to_v4().to_string();
-            auto clientSession = Session::create(*this, std::move(clientSocket));
+            auto clientSession = Session::create(_sessions, std::move(clientSocket));
             _sessions.push_back(clientSession);
             clientSession->open();
             emit clientConnected();

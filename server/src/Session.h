@@ -11,23 +11,24 @@ using boost::asio::ip::tcp;
 
 class Session : public std::enable_shared_from_this<Session>
 {
+    using SessionsList = std::list<std::shared_ptr<Session>>;
     enum
     {
         MAX_MESSAGE_LENGTH = 1024
     };
 
 public:
-    static std::shared_ptr<Session> create(Server& server, tcp::socket socket);
+    static std::shared_ptr<Session> create(SessionsList& sessions, tcp::socket socket);
     ~Session();
     void open();
 
 
 private:
-    Session(Server& server, tcp::socket socket);
+    Session(SessionsList& sessions, tcp::socket socket);
     void asyncAwaitForNewMessage();
-    void messageHandler(boost::system::error_code errorCode, size_t messageLength);
+    void readHandler(boost::system::error_code errorCode, size_t messageLength);
 
-    Server& _server;
-    tcp::socket _clientSocket;
-    char _data[MAX_MESSAGE_LENGTH];
+    SessionsList& _sessionList;
+    tcp::socket _socket;
+    char _data[MAX_MESSAGE_LENGTH] = {0};
 };

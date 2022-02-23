@@ -45,7 +45,7 @@ private:
 
     std::list<std::shared_ptr<Session>> _sessions;
     std::unique_ptr<boost::thread> _thread;
-    boost::asio::io_context _io_context;
+    boost::asio::io_context _ioContext;
     tcp::endpoint _endpoint;
     tcp::acceptor _acceptor;
     bool _running;

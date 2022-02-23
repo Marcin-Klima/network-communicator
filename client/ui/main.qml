@@ -11,6 +11,17 @@ ApplicationWindow {
     title: qsTr("Client")
     color: "#000000"
 
+    onClosing: {
+        backend.stop();
+    }
+
+    Connections {
+        target: backend
+        onMessageReceived: {
+            outputTextArea.appendText(message)
+        }
+    }
+
     Rectangle {
         id: rectangle
         color: "#000000"
@@ -38,6 +49,10 @@ ApplicationWindow {
                     readOnly: true
                     color: "black"
                     background: Rectangle{color:"transparent"}
+
+                    function appendText(stringToAppend){
+                        outputTextArea.text = outputTextArea.text + stringToAppend
+                    }
                 }
             }
 
@@ -69,9 +84,3 @@ ApplicationWindow {
         }
     }
 }
-
-/*##^##
-Designer {
-    D{i:0;formeditorZoom:0.9}
-}
-##^##*/
