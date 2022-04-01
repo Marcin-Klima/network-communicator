@@ -26,9 +26,12 @@ void Backend::threadFunction()
         BOOST_LOG_TRIVIAL(info) << "Starting main client thread";
 
         tcp::resolver resolver(_ioContext);
-        resolver.async_resolve(boost::asio::ip::host_name(), "6969",
-                                boost::bind(&Backend::resolveHandler, this, boost::asio::placeholders::error,
-                                            boost::asio::placeholders::results));
+//        resolver.async_resolve(boost::asio::ip::host_name(), "6969",
+//                                boost::bind(&Backend::resolveHandler, this, boost::asio::placeholders::error,
+//                                            boost::asio::placeholders::results));
+        boost::asio::connect(_socket, resolver.resolve(boost::asio::ip::host_name(), "6969"));
+
+        readMessage();
 
         _ioContext.run();
     }
@@ -36,15 +39,18 @@ void Backend::threadFunction()
     {
         BOOST_LOG_TRIVIAL(error) << exception.what();
     }
+
+    BOOST_LOG_TRIVIAL(info) << "end of thread";
 }
 
 void Backend::receiveInputFromFrontend(const QString& string)
 {
-    _socket.async_send(boost::asio::buffer(string.toStdString(), string.length()),
-                       [this]([[maybe_unused]] boost::system::error_code ec,
-                          [[maybe_unused]] std::size_t bytesTransferred) {
-                           BOOST_LOG_TRIVIAL(debug) << "sending: " << _buffer;
-                       });
+    boost::asio::write(_socket, boost::asio::buffer(string.toStdString()));
+//    _socket.async_send(boost::asio::buffer(string.toStdString(), string.length()),
+//                       [this]([[maybe_unused]] boost::system::error_code ec,
+//                          [[maybe_unused]] std::size_t bytesTransferred) {
+//                           BOOST_LOG_TRIVIAL(debug) << "sending: " << _buffer;
+//                       });
 }
 
 Backend::~Backend()
@@ -53,12 +59,14 @@ Backend::~Backend()
     {
         _mainThread->join();
     }
+    BOOST_LOG_TRIVIAL(info) << "backend destructor!";
 }
 
 void Backend::stop()
 {
     BOOST_LOG_TRIVIAL(debug) << "end work";
-    _socket.close();
+    _socket.message_end_of_record;
+//    _socket.close();
     _ioContext.stop();
 }
 

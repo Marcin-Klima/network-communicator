@@ -32,6 +32,7 @@ void Session::asyncAwaitForNewMessage()
 
 void Session::readHandler(boost::system::error_code errorCode, size_t messageLength)
 {
+    BOOST_LOG_TRIVIAL(info) << "message length" << messageLength;
     if (!errorCode)
     {
         std::string_view dataView(_data, messageLength);
