@@ -65,8 +65,7 @@ Backend::~Backend()
 void Backend::stop()
 {
     BOOST_LOG_TRIVIAL(debug) << "end work";
-    _socket.message_end_of_record;
-//    _socket.close();
+    _socket.close();
     _ioContext.stop();
 }
 

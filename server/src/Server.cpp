@@ -77,7 +77,7 @@ void Server::acceptNewConnection()
         {
             BOOST_LOG_TRIVIAL(info) << "client connected from ip address: "
                                     << clientSocket.remote_endpoint().address().to_v4().to_string();
-            auto clientSession = Session::create(_sessions, std::move(clientSocket));
+            auto clientSession = Session::create(this, std::move(clientSocket));
             _sessions.push_back(clientSession);
             clientSession->open();
             emit clientConnected();
@@ -97,7 +97,7 @@ void Server::testSlot()
     BOOST_LOG_TRIVIAL(info) << "TEST TEST";
 }
 
-void Server::processMessageFromClient(std::shared_ptr<Session> sender, const QString& message)
+void Server::processMessageFromClient(std::shared_ptr<Session> sender, const char* message)
 {
     for(auto session : _sessions)
     {

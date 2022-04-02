@@ -21,7 +21,7 @@ class Server : public QObject
 public:
     explicit Server();
     ~Server();
-    void processMessageFromClient(std::shared_ptr<Session> sender, const QString& message);
+    void processMessageFromClient(std::shared_ptr<Session> sender, const char* message);
 
 signals:
     void printMessage(const QString& message);

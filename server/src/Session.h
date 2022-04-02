@@ -18,17 +18,17 @@ class Session : public std::enable_shared_from_this<Session>
     };
 
 public:
-    static std::shared_ptr<Session> create(SessionsList& sessions, tcp::socket socket);
+    static std::shared_ptr<Session> create(Server* server, tcp::socket socket);
     ~Session();
     void open();
 
 
 private:
-    Session(SessionsList& sessions, tcp::socket socket);
+    Session(Server* server, tcp::socket socket);
     void asyncAwaitForNewMessage();
     void readHandler(boost::system::error_code errorCode, size_t messageLength);
 
-    SessionsList& _sessionList;
+    Server* _server;
     tcp::socket _socket;
     char _data[MAX_MESSAGE_LENGTH] = {0};
 };
