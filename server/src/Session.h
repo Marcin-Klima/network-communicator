@@ -14,14 +14,13 @@ class Session : public std::enable_shared_from_this<Session>
     using SessionsList = std::list<std::shared_ptr<Session>>;
     enum
     {
-        MAX_MESSAGE_LENGTH = 1024
+        MAX_MESSAGE_LENGTH = 5120
     };
 
 public:
     static std::shared_ptr<Session> create(Server* server, tcp::socket socket);
     ~Session();
     void open();
-
 
 private:
     Session(Server* server, tcp::socket socket);

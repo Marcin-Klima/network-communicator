@@ -32,13 +32,12 @@ void Session::asyncAwaitForNewMessage()
 
 void Session::readHandler(boost::system::error_code errorCode, size_t messageLength)
 {
-    BOOST_LOG_TRIVIAL(info) << "message length" << messageLength;
     if (!errorCode)
     {
-        std::string_view dataView(_data, messageLength);
-        BOOST_LOG_TRIVIAL(info) << "client says: " << dataView;
+        std::string message(_data, messageLength);
+        BOOST_LOG_TRIVIAL(debug) << "client says: " << message;
 
-        _server->processMessageFromClient(shared_from_this(), _data);
+        _server->processMessageFromClient(shared_from_this(), std::move(message));
         memset(_data, 0, MAX_MESSAGE_LENGTH);
         asyncAwaitForNewMessage();
     }

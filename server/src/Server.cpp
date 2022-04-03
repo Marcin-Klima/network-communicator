@@ -15,37 +15,26 @@ Server::Server() : _endpoint(tcp::v4(), 6969),
 
 }
 
-void Server::threadLoop()
-{
-    try
-    {
-        acceptNewConnection();
-
-        _ioContext.run();
-    }
-    catch (std::exception& exception)
-    {
-        BOOST_LOG_TRIVIAL(error) << "!!!EXCEPTION: " << exception.what();
-    }
-}
-
-Server::~Server()
-{
-    if (_thread != nullptr && _thread->joinable())
-    {
-        _thread->join();
-    }
-}
-
 void Server::startServer()
 {
     if (!_running)
     {
         BOOST_LOG_TRIVIAL(info) << "Starting server";
-        _running = true;
-        _ioContext.restart();
-        _thread = std::make_unique<boost::thread>(&Server::threadLoop, this);
-        emit serverStarted();
+        try
+        {
+            _running = true;
+            _ioContext.restart();
+
+            acceptNewConnection();
+            boost::thread thread([this](){ this->_ioContext.run(); });
+            emit serverStarted();
+
+            thread.join();
+        }
+        catch (std::exception& exception)
+        {
+            BOOST_LOG_TRIVIAL(error) << "!!!EXCEPTION: " << exception.what();
+        }
     }
 }
 
@@ -56,8 +45,6 @@ void Server::stopServer()
         BOOST_LOG_TRIVIAL(info) << "Stopping server";
         _ioContext.stop();
         _sessions.clear();
-        _thread->join();
-        _thread.reset(nullptr);
         _running = false;
         emit serverStopped();
     }
@@ -71,7 +58,6 @@ void Server::receiveInputFromFrontend(const QString& input)
 
 void Server::acceptNewConnection()
 {
-
     _acceptor.async_accept([this](boost::system::error_code ec, tcp::socket clientSocket) {
         if (!ec)
         {
@@ -97,7 +83,7 @@ void Server::testSlot()
     BOOST_LOG_TRIVIAL(info) << "TEST TEST";
 }
 
-void Server::processMessageFromClient(std::shared_ptr<Session> sender, const char* message)
+void Server::processMessageFromClient(std::shared_ptr<Session> sender, std::string message)
 {
     for(auto session : _sessions)
     {
@@ -107,5 +93,5 @@ void Server::processMessageFromClient(std::shared_ptr<Session> sender, const cha
 
         }
     }
-    emit printMessage(message);
+    emit printMessage(QString::fromStdString(message));
 }

@@ -20,8 +20,7 @@ class Server : public QObject
 
 public:
     explicit Server();
-    ~Server();
-    void processMessageFromClient(std::shared_ptr<Session> sender, const char* message);
+    void processMessageFromClient(std::shared_ptr<Session> sender, std::string message);
 
 signals:
     void printMessage(const QString& message);
@@ -40,11 +39,9 @@ private slots:
     void closeSession(std::shared_ptr<Session> session);
 
 private:
-    void threadLoop();
     void acceptNewConnection();
 
     std::list<std::shared_ptr<Session>> _sessions;
-    std::unique_ptr<boost::thread> _thread;
     boost::asio::io_context _ioContext;
     tcp::endpoint _endpoint;
     tcp::acceptor _acceptor;
