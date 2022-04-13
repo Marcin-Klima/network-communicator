@@ -46,4 +46,5 @@ private:
     tcp::endpoint _endpoint;
     tcp::acceptor _acceptor;
     bool _running;
+    std::unique_ptr<boost::thread> _thread;
 };

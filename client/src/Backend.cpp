@@ -26,12 +26,9 @@ void Backend::threadFunction()
         BOOST_LOG_TRIVIAL(info) << "Starting main client thread";
 
         tcp::resolver resolver(_ioContext);
-//        resolver.async_resolve(boost::asio::ip::host_name(), "6969",
-//                                boost::bind(&Backend::resolveHandler, this, boost::asio::placeholders::error,
-//                                            boost::asio::placeholders::results));
         boost::asio::connect(_socket, resolver.resolve(boost::asio::ip::host_name(), "6969"));
 
-        readMessage();
+        waitForMessage();
 
         _ioContext.run();
     }
@@ -45,12 +42,18 @@ void Backend::threadFunction()
 
 void Backend::receiveInputFromFrontend(const QString& string)
 {
-    boost::asio::write(_socket, boost::asio::buffer(string.toStdString()));
-//    _socket.async_send(boost::asio::buffer(string.toStdString(), string.length()),
-//                       [this]([[maybe_unused]] boost::system::error_code ec,
-//                          [[maybe_unused]] std::size_t bytesTransferred) {
-//                           BOOST_LOG_TRIVIAL(debug) << "sending: " << _buffer;
-//                       });
+    _socket.async_send(boost::asio::buffer(string.toStdString(), string.length()),
+                       [this](boost::system::error_code ec,
+                              std::size_t bytesTransferred) {
+                           if (!ec)
+                           {
+                               BOOST_LOG_TRIVIAL(debug) << "sending: " << _buffer;
+                           } else
+                           {
+                               stop();
+                               //todo: signal to frontend
+                           }
+                       });
 }
 
 Backend::~Backend()
@@ -69,30 +72,23 @@ void Backend::stop()
     _ioContext.stop();
 }
 
-void Backend::readMessage()
+void Backend::waitForMessage()
 {
     _socket.async_read_some(boost::asio::buffer(_buffer, 1024),
-                            [this](boost::system::error_code ec, [[maybe_unused]] std::size_t messageLength) {
-                                if (!ec)
-                                {
-                                    emit messageReceived(_buffer);
-                                    memset(_buffer, 0, 1024);
-                                    readMessage();
-                                }
-                            });
+                            boost::bind(&Backend::readHandler, this, boost::asio::placeholders::error,
+                                        boost::asio::placeholders::bytes_transferred));
 }
 
-void Backend::resolveHandler(boost::system::error_code ec, tcp::resolver::results_type result)
+void Backend::readHandler(boost::system::error_code ec, std::size_t messageLength)
 {
     if (!ec)
     {
-        boost::asio::async_connect(_socket, result,
-                                   [this](const boost::system::error_code& ec,
-                                          [[maybe_unused]] const boost::asio::ip::tcp::endpoint& endpoint) {
-                                       if (!ec)
-                                       {
-                                           readMessage();
-                                       }
-                                   });
+        emit messageReceived(_buffer);
+        memset(_buffer, 0, 1024);
+        waitForMessage();
+    } else
+    {
+        stop();
+        //todo: signal frontend about connection error!
     }
 }

@@ -32,9 +32,8 @@ public slots:
 
 private:
     void threadFunction();
-    void readMessage();
-    void resolveHandler(boost::system::error_code ec, tcp::resolver::results_type result);
-
+    void readHandler(boost::system::error_code ec, size_t messageLength);
+    void waitForMessage();
 
     std::unique_ptr<boost::thread> _mainThread;
     boost::asio::io_context _ioContext;

@@ -21,13 +21,16 @@ public:
     static std::shared_ptr<Session> create(Server* server, tcp::socket socket);
     ~Session();
     void open();
+    void dispatch(const std::string& message);
 
 private:
     Session(Server* server, tcp::socket socket);
-    void asyncAwaitForNewMessage();
+    void waitForMessage();
+    void dispatchHandler(boost::system::error_code ec, size_t bytesTransferred);
     void readHandler(boost::system::error_code errorCode, size_t messageLength);
 
     Server* _server;
     tcp::socket _socket;
+
     char _data[MAX_MESSAGE_LENGTH] = {0};
 };

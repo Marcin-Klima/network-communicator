@@ -26,10 +26,8 @@ void Server::startServer()
             _ioContext.restart();
 
             acceptNewConnection();
-            boost::thread thread([this](){ this->_ioContext.run(); });
+            _thread = std::make_unique<boost::thread>([this](){this->_ioContext.run();});
             emit serverStarted();
-
-            thread.join();
         }
         catch (std::exception& exception)
         {
@@ -44,6 +42,7 @@ void Server::stopServer()
     {
         BOOST_LOG_TRIVIAL(info) << "Stopping server";
         _ioContext.stop();
+        _thread->join();
         _sessions.clear();
         _running = false;
         emit serverStopped();
@@ -89,8 +88,7 @@ void Server::processMessageFromClient(std::shared_ptr<Session> sender, std::stri
     {
         if(session != sender)
         {
-            //todo: komunikacja pomiedzy sesjami!!!!
-
+            session->dispatch(message);
         }
     }
     emit printMessage(QString::fromStdString(message));

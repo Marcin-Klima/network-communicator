@@ -17,11 +17,11 @@ Session::Session(Server* server, tcp::socket socket) :
 
 void Session::open()
 {
-    asyncAwaitForNewMessage();
+    waitForMessage();
 }
 
 
-void Session::asyncAwaitForNewMessage()
+void Session::waitForMessage()
 {
     //boost::bind has the ability to bind function with shared_poniter of T class as *this* pointer
     _socket.async_read_some(boost::asio::buffer(_data, MAX_MESSAGE_LENGTH),
@@ -39,11 +39,10 @@ void Session::readHandler(boost::system::error_code errorCode, size_t messageLen
 
         _server->processMessageFromClient(shared_from_this(), std::move(message));
         memset(_data, 0, MAX_MESSAGE_LENGTH);
-        asyncAwaitForNewMessage();
-    }
-    else if (errorCode == boost::asio::error::eof)
+        waitForMessage();
+    } else
     {
-        BOOST_LOG_TRIVIAL(debug) << "SOCKET'S EOF";
+        BOOST_LOG_TRIVIAL(debug) << "socket closed with error: " << errorCode;
         _socket.close();
         _server->closeSession(shared_from_this());
     }
@@ -57,4 +56,16 @@ Session::~Session()
 std::shared_ptr<Session> Session::create(Server* server, tcp::socket socket)
 {
     return std::shared_ptr<Session>(new Session(server, std::move(socket)));
+}
+
+void Session::dispatch(const std::string& message)
+{
+    _socket.async_write_some(boost::asio::buffer(message), boost::bind(&Session::dispatchHandler, shared_from_this(),
+                                                                       boost::asio::placeholders::error,
+                                                                       boost::asio::placeholders::bytes_transferred));
+}
+
+void Session::dispatchHandler(boost::system::error_code ec, std::size_t bytesTransferred)
+{
+
 }
