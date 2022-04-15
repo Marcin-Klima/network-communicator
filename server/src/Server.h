@@ -7,6 +7,7 @@
 #include <QObject>
 #include <boost/thread/thread.hpp>
 #include <boost/asio.hpp>
+#include <deque>
 
 using boost::asio::ip::tcp;
 
@@ -20,7 +21,7 @@ class Server : public QObject
 
 public:
     explicit Server();
-    void processMessageFromClient(std::shared_ptr<Session> sender, std::string message);
+    void processMessageFromClient(std::shared_ptr<Session> sender, const std::string& message);
 
 signals:
     void printMessage(const QString& message);
@@ -41,10 +42,11 @@ private slots:
 private:
     void acceptNewConnection();
 
-    std::list<std::shared_ptr<Session>> _sessions;
+    std::list<std::shared_ptr<Session>> _sessions; //todo: consider using std::set
     boost::asio::io_context _ioContext;
     tcp::endpoint _endpoint;
     tcp::acceptor _acceptor;
     bool _running;
     std::unique_ptr<boost::thread> _thread;
+    std::deque<std::string> _messageQueue;
 };

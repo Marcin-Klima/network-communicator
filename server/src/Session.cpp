@@ -42,9 +42,8 @@ void Session::readHandler(boost::system::error_code errorCode, size_t messageLen
         waitForMessage();
     } else
     {
-        BOOST_LOG_TRIVIAL(debug) << "socket closed with error: " << errorCode;
-        _socket.close();
-        _server->closeSession(shared_from_this());
+        BOOST_LOG_TRIVIAL(debug) << "reading error! error code: " << errorCode;
+        stop();
     }
 }
 
@@ -58,14 +57,44 @@ std::shared_ptr<Session> Session::create(Server* server, tcp::socket socket)
     return std::shared_ptr<Session>(new Session(server, std::move(socket)));
 }
 
-void Session::dispatch(const std::string& message)
+void Session::dispatchMessage(const std::string& message)
 {
-    _socket.async_write_some(boost::asio::buffer(message), boost::bind(&Session::dispatchHandler, shared_from_this(),
-                                                                       boost::asio::placeholders::error,
-                                                                       boost::asio::placeholders::bytes_transferred));
+    bool isWriting = !_writeMessageQueue.empty();
+    _writeMessageQueue.push_back(message);
+    if (!isWriting)
+    {
+        startWriting();
+    }
 }
 
-void Session::dispatchHandler(boost::system::error_code ec, std::size_t bytesTransferred)
+void Session::startWriting()
 {
+    boost::asio::async_write(_socket,
+                             boost::asio::buffer(_writeMessageQueue.front(), _writeMessageQueue.front().length()),
+                             boost::bind(&Session::writeHandler, this, boost::asio::placeholders::error,
+                                         boost::asio::placeholders::bytes_transferred));
+}
 
+void Session::writeHandler(boost::system::error_code ec, std::size_t bytesTransferred)
+{
+    if(!ec)
+    {
+        BOOST_LOG_TRIVIAL(debug) << "Writing ok!";
+        _writeMessageQueue.pop_front();
+        if(!_writeMessageQueue.empty())
+        {
+            startWriting();
+        }
+    }
+    else
+    {
+        BOOST_LOG_TRIVIAL(error) << "Writing error! Error code: " << ec << " Bytes transferred: " << bytesTransferred;
+        stop();
+    }
+}
+
+void Session::stop()
+{
+    _socket.close();
+    _server->closeSession(shared_from_this());
 }

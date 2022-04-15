@@ -32,7 +32,7 @@ public slots:
 
 private:
     void threadFunction();
-    void readHandler(boost::system::error_code ec, size_t messageLength);
+    void waitForMessageHandler(boost::system::error_code ec, size_t messageLength);
     void waitForMessage();
 
     std::unique_ptr<boost::thread> _mainThread;

@@ -42,18 +42,18 @@ void Backend::threadFunction()
 
 void Backend::receiveInputFromFrontend(const QString& string)
 {
-    _socket.async_send(boost::asio::buffer(string.toStdString(), string.length()),
-                       [this](boost::system::error_code ec,
-                              std::size_t bytesTransferred) {
-                           if (!ec)
-                           {
-                               BOOST_LOG_TRIVIAL(debug) << "sending: " << _buffer;
-                           } else
-                           {
-                               stop();
-                               //todo: signal to frontend
-                           }
-                       });
+    boost::asio::async_write(_socket, boost::asio::buffer(string.toStdString(), string.length()),
+                             [this](boost::system::error_code ec,
+                                    std::size_t bytesTransferred) {
+                                 if (!ec)
+                                 {
+                                     BOOST_LOG_TRIVIAL(debug) << "sending: " << _buffer;
+                                 } else
+                                 {
+                                     stop();
+                                     //todo: signal to frontend
+                                 }
+                             });
 }
 
 Backend::~Backend()
@@ -75,11 +75,11 @@ void Backend::stop()
 void Backend::waitForMessage()
 {
     _socket.async_read_some(boost::asio::buffer(_buffer, 1024),
-                            boost::bind(&Backend::readHandler, this, boost::asio::placeholders::error,
+                            boost::bind(&Backend::waitForMessageHandler, this, boost::asio::placeholders::error,
                                         boost::asio::placeholders::bytes_transferred));
 }
 
-void Backend::readHandler(boost::system::error_code ec, std::size_t messageLength)
+void Backend::waitForMessageHandler(boost::system::error_code ec, std::size_t messageLength)
 {
     if (!ec)
     {

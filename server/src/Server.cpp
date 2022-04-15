@@ -82,13 +82,15 @@ void Server::testSlot()
     BOOST_LOG_TRIVIAL(info) << "TEST TEST";
 }
 
-void Server::processMessageFromClient(std::shared_ptr<Session> sender, std::string message)
+void Server::processMessageFromClient(std::shared_ptr<Session> sender, const std::string& message)
 {
+    //todo: determine max queue length and delete from front
+    _messageQueue.push_back(message);
     for(auto session : _sessions)
     {
         if(session != sender)
         {
-            session->dispatch(message);
+            session->dispatchMessage(message);
         }
     }
     emit printMessage(QString::fromStdString(message));
