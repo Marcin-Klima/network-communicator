@@ -25,9 +25,9 @@ public:
 
 private:
     Session(Server* server, tcp::socket socket);
-    void waitForMessage();
+    void awaitMessage();
     void writeHandler(boost::system::error_code ec, size_t bytesTransferred);
-    void readHandler(boost::system::error_code errorCode, size_t messageLength);
+    void awaitMessageHandler(boost::system::error_code errorCode, size_t messageLength);
     void stop();
 
     void startWriting();

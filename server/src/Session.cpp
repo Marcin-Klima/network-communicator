@@ -17,29 +17,27 @@ Session::Session(Server* server, tcp::socket socket) :
 
 void Session::open()
 {
-    waitForMessage();
+    awaitMessage();
 }
 
 
-void Session::waitForMessage()
+void Session::awaitMessage()
 {
-    //boost::bind has the ability to bind function with shared_poniter of T class as *this* pointer
     _socket.async_read_some(boost::asio::buffer(_data, MAX_MESSAGE_LENGTH),
-                            boost::bind(&Session::readHandler, shared_from_this(),
+                            boost::bind(&Session::awaitMessageHandler, shared_from_this(),
                                         boost::asio::placeholders::error,
                                         boost::asio::placeholders::bytes_transferred));
 }
 
-void Session::readHandler(boost::system::error_code errorCode, size_t messageLength)
+void Session::awaitMessageHandler(boost::system::error_code errorCode, size_t messageLength)
 {
     if (!errorCode)
     {
         std::string message(_data, messageLength);
         BOOST_LOG_TRIVIAL(debug) << "client says: " << message;
 
-        _server->processMessageFromClient(shared_from_this(), std::move(message));
-        memset(_data, 0, MAX_MESSAGE_LENGTH);
-        waitForMessage();
+        _server->sendOutMessage(shared_from_this(), std::move(message));
+        awaitMessage();
     } else
     {
         BOOST_LOG_TRIVIAL(debug) << "reading error! error code: " << errorCode;
@@ -89,6 +87,10 @@ void Session::writeHandler(boost::system::error_code ec, std::size_t bytesTransf
     else
     {
         BOOST_LOG_TRIVIAL(error) << "Writing error! Error code: " << ec << " Bytes transferred: " << bytesTransferred;
+        if(ec == boost::asio::error::eof)
+        {
+            BOOST_LOG_TRIVIAL(info) << "EOF";
+        }
         stop();
     }
 }

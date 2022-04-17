@@ -63,7 +63,8 @@ void Server::acceptNewConnection()
             BOOST_LOG_TRIVIAL(info) << "client connected from ip address: "
                                     << clientSocket.remote_endpoint().address().to_v4().to_string();
             auto clientSession = Session::create(this, std::move(clientSocket));
-            _sessions.push_back(clientSession);
+            std::lock_guard<std::mutex> lockGuard(_clientQueueMutex);
+            _sessions.insert(clientSession);
             clientSession->open();
             emit clientConnected();
         }
@@ -73,7 +74,8 @@ void Server::acceptNewConnection()
 
 void Server::closeSession(std::shared_ptr<Session> session)
 {
-    _sessions.erase(std::find(_sessions.begin(), _sessions.end(), session));
+    std::lock_guard<std::mutex> lockGuard(_clientQueueMutex);
+    _sessions.erase(session);
     emit clientDisconnected();
 }
 
@@ -82,11 +84,12 @@ void Server::testSlot()
     BOOST_LOG_TRIVIAL(info) << "TEST TEST";
 }
 
-void Server::processMessageFromClient(std::shared_ptr<Session> sender, const std::string& message)
+void Server::sendOutMessage(std::shared_ptr<Session> sender, std::string message)
 {
     //todo: determine max queue length and delete from front
     _messageQueue.push_back(message);
-    for(auto session : _sessions)
+    std::lock_guard lockGuard(_clientQueueMutex);
+    for(const auto& session : _sessions)
     {
         if(session != sender)
         {
