@@ -47,7 +47,6 @@ void Backend::receiveInputFromFrontend(const QString& string)
                                     std::size_t bytesTransferred) {
                                  if (!ec)
                                  {
-                                     BOOST_LOG_TRIVIAL(debug) << "sending: " << _buffer;
                                  } else
                                  {
                                      stop();

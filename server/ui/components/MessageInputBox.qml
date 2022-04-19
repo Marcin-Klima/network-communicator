@@ -18,6 +18,7 @@ Rectangle {
 
         Keys.onReturnPressed: {
             if(text.length > 0) {
+                text += '\n'
                 backend.receiveInputFromFrontend(text)
                 clear()
             }

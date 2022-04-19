@@ -18,7 +18,7 @@ ApplicationWindow {
     Connections {
         target: backend
         onMessageReceived: {
-            outputTextArea.appendText(message)
+            outputTextArea.appendText(message + '\n')
         }
     }
 
@@ -72,6 +72,7 @@ ApplicationWindow {
 
                     Keys.onReturnPressed: {
                         if(text.length > 0) {
+                            outputTextArea.text += text + '\n'
                             backend.receiveInputFromFrontend(text)
                             clear()
                         }

@@ -36,7 +36,7 @@ void Session::awaitMessageHandler(boost::system::error_code errorCode, size_t me
         std::string message(_data, messageLength);
         BOOST_LOG_TRIVIAL(debug) << "client says: " << message;
 
-        _server->sendOutMessage(shared_from_this(), std::move(message));
+        _server->sendOutMessage(shared_from_this(), message);
         awaitMessage();
     } else
     {
@@ -77,7 +77,6 @@ void Session::writeHandler(boost::system::error_code ec, std::size_t bytesTransf
 {
     if(!ec)
     {
-        BOOST_LOG_TRIVIAL(debug) << "Writing ok!";
         _writeMessageQueue.pop_front();
         if(!_writeMessageQueue.empty())
         {

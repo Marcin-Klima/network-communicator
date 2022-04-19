@@ -21,7 +21,7 @@ class Server : public QObject
 
 public:
     explicit Server();
-    void sendOutMessage(std::shared_ptr<Session> sender, std::string message);
+    void sendOutMessage(const std::shared_ptr<Session>& sender, const std::string& message);
 
 signals:
     void printMessage(const QString& message);
@@ -42,7 +42,7 @@ private slots:
 private:
     void acceptNewConnection();
 
-    std::set<std::shared_ptr<Session>> _sessions; //todo: consider using std::set
+    std::set<std::shared_ptr<Session>> _sessions;
     boost::asio::io_context _ioContext;
     tcp::endpoint _endpoint;
     tcp::acceptor _acceptor;

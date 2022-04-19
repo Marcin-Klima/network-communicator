@@ -23,7 +23,7 @@ ApplicationWindow {
     Connections {
         target: backend
         onPrintMessage: {
-            messageHistoryBox.appendText(message)
+            messageHistoryBox.appendText(message + '\n')
         }
         onServerStarted: {
             backendComponent.isRunning = true
