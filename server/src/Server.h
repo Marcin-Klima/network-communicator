@@ -8,6 +8,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/asio.hpp>
 #include <deque>
+#include <set>
 
 using boost::asio::ip::tcp;
 
@@ -22,6 +23,7 @@ class Server : public QObject
 public:
     explicit Server();
     void sendOutMessage(const std::shared_ptr<Session>& sender, const std::string& message);
+    void messageSubmittedToNetworkStack(const std::shared_ptr<Session>& sender, std::shared_ptr<std::string> message);
 
 signals:
     void printMessage(const QString& message);
@@ -48,6 +50,6 @@ private:
     tcp::acceptor _acceptor;
     bool _running;
     std::unique_ptr<boost::thread> _thread;
-    std::deque<std::string> _messageQueue;
+    std::unordered_map<std::shared_ptr<std::string>, size_t> _messageMap;
     std::mutex _clientQueueMutex;
 };

@@ -55,7 +55,7 @@ std::shared_ptr<Session> Session::create(Server* server, tcp::socket socket)
     return std::shared_ptr<Session>(new Session(server, std::move(socket)));
 }
 
-void Session::dispatchMessage(const std::string& message)
+void Session::dispatchMessage(std::shared_ptr<std::string> message)
 {
     bool isWriting = !_writeMessageQueue.empty();
     _writeMessageQueue.push_back(message);
@@ -67,26 +67,26 @@ void Session::dispatchMessage(const std::string& message)
 
 void Session::startWriting()
 {
-    boost::asio::async_write(_socket,
-                             boost::asio::buffer(_writeMessageQueue.front(), _writeMessageQueue.front().length()),
+    auto buffer = boost::asio::buffer(_writeMessageQueue.front().get(), _writeMessageQueue.front()->length());
+    boost::asio::async_write(_socket, buffer,
                              boost::bind(&Session::writeHandler, this, boost::asio::placeholders::error,
                                          boost::asio::placeholders::bytes_transferred));
 }
 
 void Session::writeHandler(boost::system::error_code ec, std::size_t bytesTransferred)
 {
-    if(!ec)
+    if (!ec)
     {
+        _server->messageSubmittedToNetworkStack(shared_from_this(), _writeMessageQueue.front());
         _writeMessageQueue.pop_front();
-        if(!_writeMessageQueue.empty())
+        if (!_writeMessageQueue.empty())
         {
             startWriting();
         }
-    }
-    else
+    } else
     {
         BOOST_LOG_TRIVIAL(error) << "Writing error! Error code: " << ec << " Bytes transferred: " << bytesTransferred;
-        if(ec == boost::asio::error::eof)
+        if (ec == boost::asio::error::eof)
         {
             BOOST_LOG_TRIVIAL(info) << "EOF";
         }

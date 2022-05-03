@@ -21,7 +21,7 @@ public:
     static std::shared_ptr<Session> create(Server* server, tcp::socket socket);
     ~Session();
     void open();
-    void dispatchMessage(const std::string& message);
+    void dispatchMessage(std::shared_ptr<std::string> message);
 
 private:
     Session(Server* server, tcp::socket socket);
@@ -36,5 +36,5 @@ private:
     tcp::socket _socket;
 
     char _data[MAX_MESSAGE_LENGTH] = {0};
-    std::deque<std::string> _writeMessageQueue;
+    std::deque<std::shared_ptr<std::string>> _writeMessageQueue;
 };

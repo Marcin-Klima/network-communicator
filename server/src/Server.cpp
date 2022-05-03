@@ -87,14 +87,26 @@ void Server::testSlot()
 void Server::sendOutMessage(const std::shared_ptr<Session>& sender, const std::string& message)
 {
     //todo: determine max queue length and delete from front
-    _messageQueue.push_back(message);
+    auto messagePointer = std::make_shared<std::string>(message);
     std::lock_guard lockGuard(_clientQueueMutex);
+    _messageMap[messagePointer] = _sessions.size() - 1;
     for(const auto& session : _sessions)
     {
         if(session != sender)
         {
-            session->dispatchMessage(message);
+            session->dispatchMessage(messagePointer);
         }
     }
     emit printMessage(QString::fromStdString(message));
+}
+
+void Server::messageSubmittedToNetworkStack(const std::shared_ptr<Session>& sender, std::shared_ptr<std::string> message)
+{
+    BOOST_LOG_TRIVIAL(info) << "submitted in: " << sender;
+    _messageMap[message]--;
+    if(_messageMap[message] == 0)
+    {
+        BOOST_LOG_TRIVIAL(info) << "message submitted in all clients' sessions!";
+        _messageMap.erase(message);
+    }
 }
