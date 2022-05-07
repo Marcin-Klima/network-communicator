@@ -17,6 +17,7 @@ target_sources(klima-server PRIVATE
 		src/Server.h
 		src/Session.h
 		src/Frontend.h
+		src/ServerInterface.h
 )
 
 target_link_libraries(klima-server

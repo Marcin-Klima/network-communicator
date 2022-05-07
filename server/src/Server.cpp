@@ -72,7 +72,7 @@ void Server::acceptNewConnection()
     });
 }
 
-void Server::closeSession(std::shared_ptr<Session> session)
+void Server::closeSession(const std::shared_ptr<Session>& session)
 {
     std::lock_guard<std::mutex> lockGuard(_clientQueueMutex);
     _sessions.erase(session);
@@ -84,24 +84,8 @@ void Server::testSlot()
     BOOST_LOG_TRIVIAL(info) << "TEST TEST";
 }
 
-void Server::sendOutMessage(const std::shared_ptr<Session>& sender, const std::string& message)
-{
-    //todo: determine max queue length and delete from front
-    emit printMessage(QString::fromStdString(message));
-
-    auto messagePointer = std::make_shared<std::string>(message);
-    std::lock_guard lockGuard(_clientQueueMutex);
-    _messageMap[messagePointer] = _sessions.size() - 1;
-    for(const auto& session : _sessions)
-    {
-        if(session != sender)
-        {
-            session->dispatchMessage(messagePointer);
-        }
-    }
-}
-
-void Server::messageSubmittedToNetworkStack(const std::shared_ptr<Session>& sender, std::shared_ptr<std::string> message)
+void Server::notifyMessageSubmittalToNetworkStack(const std::shared_ptr<Session>& sender,
+                                                  std::shared_ptr<std::string> message)
 {
     BOOST_LOG_TRIVIAL(info) << "submitted in: " << sender;
     _messageMap[message]--;
@@ -109,5 +93,25 @@ void Server::messageSubmittedToNetworkStack(const std::shared_ptr<Session>& send
     {
         BOOST_LOG_TRIVIAL(info) << "message submitted in all clients' sessions!";
         _messageMap.erase(message);
+    }
+}
+
+void Server::deliverMessage(const std::shared_ptr<Session>& sender, std::shared_ptr<std::string> message)
+{
+    //todo: move it
+    emit printMessage(QString(message->data()));
+
+    std::lock_guard lockGuard(_clientQueueMutex);
+    auto connectedSessions = _sessions.size();
+    if(connectedSessions > 1)
+    {
+        _messageMap[message] = connectedSessions - 1;
+        for(const auto& session : _sessions)
+        {
+            if(session != sender)
+            {
+                session->dispatchMessage(message);
+            }
+        }
     }
 }

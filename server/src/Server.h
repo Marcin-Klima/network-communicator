@@ -9,21 +9,22 @@
 #include <boost/asio.hpp>
 #include <deque>
 #include <set>
+#include "ServerInterface.h"
 
 using boost::asio::ip::tcp;
 
-class Session;
-
-class Server : public QObject
+class Server : public QObject, public ServerInterface
 {
     Q_OBJECT
 
-    friend class Session;
-
 public:
     explicit Server();
-    void sendOutMessage(const std::shared_ptr<Session>& sender, const std::string& message);
-    void messageSubmittedToNetworkStack(const std::shared_ptr<Session>& sender, std::shared_ptr<std::string> message);
+
+    //ServerInterface implementation
+    void notifyMessageSubmittalToNetworkStack(const std::shared_ptr<Session>& sender,
+                                              std::shared_ptr<std::string> message) override;
+    void deliverMessage(const std::shared_ptr<Session>& sender, std::shared_ptr<std::string> message) override;
+    void closeSession(const std::shared_ptr<Session>& session) override;
 
 signals:
     void printMessage(const QString& message);
@@ -37,9 +38,6 @@ public slots:
     void startServer();
     void stopServer();
     void testSlot();
-
-private slots:
-    void closeSession(std::shared_ptr<Session> session);
 
 private:
     void acceptNewConnection();

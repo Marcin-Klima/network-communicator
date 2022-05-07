@@ -8,8 +8,8 @@
 
 #include <string>
 
-Session::Session(Server* server, tcp::socket socket) :
-        _server(server),
+Session::Session(ServerInterface* serverInterface, tcp::socket socket) :
+        _serverInterface(serverInterface),
         _socket(std::move(socket))
 {
     BOOST_LOG_TRIVIAL(debug) << "konstruktor";
@@ -33,10 +33,10 @@ void Session::awaitMessageHandler(boost::system::error_code errorCode, size_t me
 {
     if (!errorCode)
     {
-        std::string message(_data, messageLength);
+        auto message = std::make_shared<std::string>(_data);
         BOOST_LOG_TRIVIAL(debug) << "client says: " << message;
 
-        _server->sendOutMessage(shared_from_this(), message);
+        _serverInterface->deliverMessage(shared_from_this(), message);
         awaitMessage();
     } else
     {
@@ -50,9 +50,9 @@ Session::~Session()
     BOOST_LOG_TRIVIAL(debug) << "session's destructor";
 }
 
-std::shared_ptr<Session> Session::create(Server* server, tcp::socket socket)
+std::shared_ptr<Session> Session::create(ServerInterface* serverInterface, tcp::socket socket)
 {
-    return std::shared_ptr<Session>(new Session(server, std::move(socket)));
+    return std::shared_ptr<Session>(new Session(serverInterface, std::move(socket)));
 }
 
 void Session::dispatchMessage(std::shared_ptr<std::string> message)
@@ -61,11 +61,11 @@ void Session::dispatchMessage(std::shared_ptr<std::string> message)
     _writeMessageQueue.push_back(message);
     if (!isWriting)
     {
-        startWriting();
+        write();
     }
 }
 
-void Session::startWriting()
+void Session::write()
 {
     auto buffer = boost::asio::buffer(_writeMessageQueue.front().get(), _writeMessageQueue.front()->length());
     boost::asio::async_write(_socket, buffer,
@@ -77,11 +77,11 @@ void Session::writeHandler(boost::system::error_code ec, std::size_t bytesTransf
 {
     if (!ec)
     {
-        _server->messageSubmittedToNetworkStack(shared_from_this(), _writeMessageQueue.front());
+        _serverInterface->notifyMessageSubmittalToNetworkStack(shared_from_this(), _writeMessageQueue.front());
         _writeMessageQueue.pop_front();
         if (!_writeMessageQueue.empty())
         {
-            startWriting();
+            write();
         }
     } else
     {
@@ -97,5 +97,5 @@ void Session::writeHandler(boost::system::error_code ec, std::size_t bytesTransf
 void Session::stop()
 {
     _socket.close();
-    _server->closeSession(shared_from_this());
+    _serverInterface->closeSession(shared_from_this());
 }
