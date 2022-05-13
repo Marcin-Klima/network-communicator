@@ -41,5 +41,11 @@ target_compile_definitions(klima-server PRIVATE
 		${${Qt5Quick_DEFINITIONS}}
 )
 
+get_target_property(server-libs klima-server LINK_LIBRARIES)
+LIST(SORT server-libs)
+message(STATUS "List of libraries which server links to:")
+foreach(lib ${server-libs})
+	message(STATUS ${lib})
+endforeach()
 
 include(example.cmake)

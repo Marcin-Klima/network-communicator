@@ -12,8 +12,8 @@ Install *Conan*:
 
 Install dependencies, using *Conan*:
 ```
-	conan install . -s build_type=Debug -if conan-debug
-	conan install . -s build_type=Release -if conan-release
+	conan install . -s build_type=Debug -if conanfiles/debug
+	conan install . -s build_type=Release -if conanfiles/release
 ```
 
 windeployqt --release/--debug --qmldir QTDIR/*version*/*compiler*/qml

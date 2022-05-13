@@ -15,7 +15,7 @@ target_sources(klima-client PRIVATE
 )
 
 target_link_libraries(klima-client
-		${CONAN_LIBS}
+		${CONAN_LIBS_BOOST}
 		Qt5::Quick
 		Qt5::Widgets
 		Qt5::Qml
@@ -23,7 +23,7 @@ target_link_libraries(klima-client
 
 target_include_directories(klima-client PRIVATE
 		${PROJECT_SOURCE_DIR}/common
-		${CONAN_INCLUDE_DIRS}
+		${CONAN_INCLUDE_DIRS_BOOST}
 		${Qt5Widgets_INCLUDE_DIRS}
 		${QtQml_INCLUDE_DIRS}
 )
@@ -33,5 +33,12 @@ target_compile_definitions(klima-client PRIVATE
 		${QtQml_DEFINITIONS}
 		${${Qt5Quick_DEFINITIONS}}
 )
+
+get_target_property(client-libs klima-client LINK_LIBRARIES)
+LIST(SORT client-libs)
+message(STATUS "List of libraries which client links to:")
+foreach(lib ${client-libs})
+	message(STATUS ${lib})
+endforeach()
 
 include(example.cmake)
