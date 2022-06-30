@@ -98,14 +98,13 @@ void Server::notifyMessageSubmittalToNetworkStack(const std::shared_ptr<Session>
 
 void Server::deliverMessage(const std::shared_ptr<Session>& sender, std::shared_ptr<std::string> message)
 {
-    //todo: move it
     emit printMessage(QString(message->data()));
 
     std::lock_guard lockGuard(_clientQueueMutex);
-    auto connectedSessions = _sessions.size();
-    if(connectedSessions > 1)
+    auto connectedClients = _sessions.size();
+    if(connectedClients > 1)
     {
-        _messageMap[message] = connectedSessions - 1;
+        _messageMap[message] = connectedClients - 1;
         for(const auto& session : _sessions)
         {
             if(session != sender)

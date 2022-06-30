@@ -20,6 +20,19 @@ ApplicationWindow {
         id: backendComponent
     }
 
+
+    Popup {
+        id: registerPopupWindow
+        anchors.centerIn: parent
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+        modal: true
+        focus: true
+        padding: 0
+        contentItem: RegisterWindow {
+        }
+
+    }
+
     Connections {
         target: backend
         onPrintMessage: {
@@ -61,6 +74,14 @@ ApplicationWindow {
                 Layout.fillHeight: true
                 Layout.minimumWidth: 200
                 Layout.rowSpan: 2
+
+                Button {
+                    id: developementButton
+                    x: 59
+                    y: 98
+                    text: qsTr("DEVELOPEMENT_TEST")
+                    onClicked: registerPopupWindow.open()
+                }
             }
 
             MessageHistoryBox {

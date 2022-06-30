@@ -5,5 +5,7 @@
         <file>components/MessageHistoryBox.qml</file>
         <file>components/Backend.qml</file>
         <file>components/StatusBar.qml</file>
+        <file>components/RegisterWindow.qml</file>
+        <file>components/FormTextInput.qml</file>
     </qresource>
 </RCC>

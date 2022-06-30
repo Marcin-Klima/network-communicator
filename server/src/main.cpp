@@ -1,12 +1,11 @@
-#include <boost/log/trivial.hpp>
+#include <spdlog/spdlog.h>
 
 #include "Server.h"
 #include "Frontend.h"
 
 int main(int argc, char** argv)
 {
-    BOOST_LOG_TRIVIAL(info) << "Running application";
-
+    spdlog::info("Running server application");
 
     Server server;
     Frontend frontend;

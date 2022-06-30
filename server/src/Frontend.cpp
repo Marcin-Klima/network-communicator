@@ -6,7 +6,7 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 
-#include <boost/log/trivial.hpp>
+#include <spdlog/spdlog.h>
 
 #include "Frontend.h"
 #include "Server.h"
@@ -21,7 +21,7 @@ void Frontend::run(int argc, char** argv, Server& server)
             [&application](QObject* object, [[maybe_unused]] const QUrl& objUrl) {
                 if (object == nullptr)
                 {
-                    BOOST_LOG_TRIVIAL(error) << "error while loading frontend: " << objUrl.toString().toStdString();
+                    spdlog::error("Error while loading frontend object tree: " + objUrl.toString().toStdString());
                     application.exit(-100);
                 }
             }, Qt::QueuedConnection);

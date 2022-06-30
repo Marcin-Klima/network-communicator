@@ -11,13 +11,13 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 endif()
 
 if (MSVC)
-	add_compile_options(/W4) # /WX = -werror
+	add_compile_options(/W4 /std:c++20) # /WX = -werror
 	add_compile_definitions(_WIN32_WINNT=0x0601)
 	if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
 		add_compile_options(/Od /Zi)
 	endif()
 else()
-	add_compile_options(-Wall -Wextra -pedantic)
+	add_compile_options(-Wall -Wextra -pedantic -std=c++20)
 	if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
 		add_compile_options(-O0 -g)
 	endif()

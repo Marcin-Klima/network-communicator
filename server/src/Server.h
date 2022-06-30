@@ -43,11 +43,11 @@ private:
     void acceptNewConnection();
 
     std::set<std::shared_ptr<Session>> _sessions;
+    std::unordered_map<std::shared_ptr<std::string>, size_t> _messageMap;
     boost::asio::io_context _ioContext;
     tcp::endpoint _endpoint;
     tcp::acceptor _acceptor;
     bool _running;
     std::unique_ptr<boost::thread> _thread;
-    std::unordered_map<std::shared_ptr<std::string>, size_t> _messageMap;
     std::mutex _clientQueueMutex;
 };
